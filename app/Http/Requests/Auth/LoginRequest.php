@@ -42,25 +42,45 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = User::where('email',$this->email)->first();
+        $user = User::where('email', $this->email)->first();
 
-        if($user && $user->status==='pending'){
+        // User not found
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Account pending
+        if ($user->status === 'pending') {
             throw ValidationException::withMessages([
                 'email' => 'Your account is pending HR approval.',
             ]);
         }
 
-        if($user && $user->status === 'rejected'){
+        // Account rejected
+        if ($user->status === 'rejected') {
             throw ValidationException::withMessages([
                 'email' => 'Your account has been rejected. Please contact HR.',
             ]);
         }
 
-        if (! Auth::attempt([
-            'email' => $this->email,
-            'password' => $this->password,
-            'status' => 'approved'
-        ], $this->boolean('remember'))) {
+        // Email not verified
+        if (is_null($user->email_verified_at)) {
+            throw ValidationException::withMessages([
+                'email' => 'Please verify your email before logging in.',
+            ]);
+        }
+
+        // Final authentication attempt
+        if (
+            !Auth::attempt([
+                'email' => $this->email,
+                'password' => $this->password,
+                'status' => 'approved',
+            ], $this->boolean('remember'))
+        ) {
+
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -78,7 +98,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -99,6 +119,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }
