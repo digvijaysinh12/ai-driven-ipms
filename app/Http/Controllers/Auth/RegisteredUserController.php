@@ -51,6 +51,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return redirect()->route('login')->with('status','Your account is pending HR approval.');
+        Auth::login($user);
+        return redirect()->route('verification.notice');
     }
 }
