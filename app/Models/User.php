@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Technology;
+use App\Models\Role;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -48,7 +50,11 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-        public function role(){
+    public function role(){
         return $this->belongsTo(Role::class);
+    }
+
+    public function technology(){
+        return $this->belongsTo(Technology::class);
     }
 }
