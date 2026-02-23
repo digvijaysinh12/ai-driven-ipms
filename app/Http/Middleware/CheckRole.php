@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Cast\String_;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -13,8 +14,13 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next,string $role): Response
     {
+        $user = $request->user();
+
+        if($user->role->name !== $role){
+            abort(403);
+        }
         return $next($request);
     }
 }
