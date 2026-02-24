@@ -16,6 +16,7 @@ class DashboardController extends Controller
     {
         $users = User::with('role')
             ->where('status', 'pending')
+            ->whereNotNull('email_verified_at')
             ->whereHas('role', function ($query) {
                 $query->whereIn('name', ['intern', 'mentor']);
             })
@@ -61,10 +62,13 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'Cannot approve HR account.');
         }
 
+        if(!$user->email_verified_at){
+            return redirect()->back()->with('error','User email is not verified.');
+        }
+
         $user->update([
             'status' => 'approved'
         ]);
-
         return redirect()->back()->with('success', 'User approved successfully.');
     }
 
