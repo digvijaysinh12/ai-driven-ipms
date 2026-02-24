@@ -34,5 +34,8 @@
         @yield('content')
     </main>
 
+    <!-- Scripts Stack (IMPORTANT) -->
+    @stack('scripts')
+
 </body>
 </html>
