@@ -21,7 +21,6 @@
 
         <div class="p-6 flex items-center justify-between">
 
-            <!-- User Info -->
             <div>
                 <h4 class="text-gray-800 font-semibold">
                     {{ $user->name }}
@@ -36,11 +35,9 @@
                 </span>
             </div>
 
-            <!-- Buttons -->
             <div class="flex gap-3">
 
-                <form method="POST"
-                      action="{{ route('hr.users.approve', $user->id) }}">
+                <form method="POST" action="{{ route('hr.users.approve', $user->id) }}">
                     @csrf
                     @method('PATCH')
                     <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
@@ -48,8 +45,7 @@
                     </button>
                 </form>
 
-                <form method="POST"
-                      action="{{ route('hr.users.reject', $user->id) }}">
+                <form method="POST" action="{{ route('hr.users.reject', $user->id) }}">
                     @csrf
                     @method('PATCH')
                     <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
@@ -62,11 +58,9 @@
         </div>
 
         @empty
-
         <div class="p-10 text-center text-gray-500">
             No pending users found.
         </div>
-
         @endforelse
 
     </div>
@@ -74,3 +68,47 @@
 </div>
 
 @endsection
+
+
+@push('scripts')
+
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true
+});
+</script>
+
+@if(session('success'))
+<script>
+    Toast.fire({
+        icon: 'success',
+        title: "{{ session('success') }}"
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Toast.fire({
+        icon: 'error',
+        title: "{{ session('error') }}"
+    });
+</script>
+@endif
+
+@if($errors->any())
+<script>
+    Toast.fire({
+        icon: 'error',
+        title: "{{ $errors->first() }}"
+    });
+</script>
+@endif
+@endpush
