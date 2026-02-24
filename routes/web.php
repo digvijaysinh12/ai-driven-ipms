@@ -22,7 +22,26 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified','approved'])->name('dashboard');
+
+
+/*
+|--------------------------------------------------------------------------
+| Intern Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','verified','checkrole:intern','approved'])
+    ->prefix('intern')
+    ->name('intern.')
+    ->group(function(){
+        
+        // Intern Dashboard
+        Route::get('/dashboard',function(){
+            return view('intern.dashboard');
+        })->name('dashboard');
+    });
+
 
 /*
 |--------------------------------------------------------------------------
