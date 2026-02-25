@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HR\DashboardController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HR\MentorAssignmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,60 +17,108 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Default Dashboard (for normal users if needed)
+| Default Dashboard (Optional)
 |--------------------------------------------------------------------------
 */
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified','approved'])->name('dashboard');
+})->middleware(['auth', 'verified', 'approved'])
+  ->name('dashboard');
 
 
 /*
 |--------------------------------------------------------------------------
-| Intern Routes
+| Intern Waiting Route (NO assigned middleware)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth','verified','checkrole:intern','approved'])
+Route::middleware(['auth','verified','approved','checkrole:intern'])
     ->prefix('intern')
     ->name('intern.')
     ->group(function(){
-        
-        // Intern Dashboard
-        Route::get('/dashboard',function(){
-            return view('intern.dashboard');
-        })->name('dashboard');
-    });
+
+        Route::get('/waiting', function(){
+            return view('intern.waiting');
+        })->name('waiting');
+
+});
 
 
 /*
 |--------------------------------------------------------------------------
-| HR Routes (Fully Protected)
+| Intern Protected Routes (WITH assigned middleware)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'checkrole:hr'])
+Route::middleware(['auth','verified','approved','assigned','checkrole:intern'])
+    ->prefix('intern')
+    ->name('intern.')
+    ->group(function(){
+
+        Route::get('/dashboard', function(){
+            return view('intern.dashboard');
+        })->name('dashboard');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Mentor Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','verified','approved','checkrole:mentor'])
+    ->prefix('mentor')
+    ->name('mentor.')
+    ->group(function(){
+
+        Route::get('/dashboard', function(){
+            return view('mentor.dashboard');
+        })->name('dashboard');
+
+        Route::get('/interns', function(){
+            return view('mentor.interns');
+        })->name('interns');
+
+        Route::get('/assignments', function(){
+            return view('mentor.assignments');
+        })->name('assignments');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| HR Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','verified','checkrole:hr'])
     ->prefix('hr')
     ->name('hr.')
     ->group(function () {
 
-        // HR Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])
+        Route::get('/dashboard', [DashboardController::class, 'users'])
             ->name('dashboard');
 
-        // View All Users (optional separate page)
-        Route::get('/users', [DashboardController::class, 'users'])
+        Route::get('/users', [DashboardController::class, 'index'])
             ->name('users');
 
-        // Approve User
         Route::patch('/users/{id}/approve', [DashboardController::class, 'approve'])
             ->name('users.approve');
 
-        // Reject User
         Route::patch('/users/{id}/reject', [DashboardController::class, 'reject'])
             ->name('users.reject');
-    });
+
+        Route::post('/assigned-mentor', [MentorAssignmentController::class, 'assign'])
+            ->name('assigned.mentor');
+
+        Route::get('/mentor-assignments', 
+            [MentorAssignmentController::class, 'index']
+        )->name('mentor.assignments');
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +137,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
+
 
 /*
 |--------------------------------------------------------------------------
