@@ -1,41 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>HR Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css'])
-</head>
+@extends('layouts.app')
 
-<body class="bg-gray-100">
+@section('body')
 
-    <!-- Top Navbar -->
-    <nav class="bg-white shadow px-8 py-4 flex justify-between items-center">
-        <h1 class="text-lg font-semibold text-gray-800">
-            AI Internship System
-        </h1>
+<div class="flex min-h-screen">
 
-        <div class="flex items-center gap-4">
-            <span class="text-gray-600 text-sm">
-                Welcome, {{ auth()->user()->name }}
-            </span>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-6 flex flex-col justify-between">
 
-            <form method="POST" action="{{ route('logout') }}">
+        <div>
+            <h2 class="text-xl font-bold mb-6">HR Panel</h2>
+
+            <nav class="space-y-2">
+
+                <a href="{{ route('hr.dashboard') }}"
+                   class="block px-3 py-2 rounded-lg
+                   {{ request()->routeIs('hr.dashboard') ? 'bg-indigo-100 text-indigo-600 font-semibold' : 'text-gray-700 hover:text-indigo-600' }}">
+                    Dashboard
+                </a>
+
+                <a href="{{ route('hr.users') }}"
+                   class="block px-3 py-2 rounded-lg
+                   {{ request()->routeIs('hr.users') ? 'bg-indigo-100 text-indigo-600 font-semibold' : 'text-gray-700 hover:text-indigo-600' }}">
+                    Approvals
+                </a>
+
+                <a href="{{ route('hr.mentor.assignments') }}"
+                   class="block px-3 py-2 rounded-lg
+                   {{ request()->routeIs('hr.mentor.assignments') ? 'bg-indigo-100 text-indigo-600 font-semibold' : 'text-gray-700 hover:text-indigo-600' }}">
+                    Mentor Assignment
+                </a>
+
+            </nav>
+        </div>
+
+        <div class="border-t pt-6">
+            <p class="text-sm text-gray-600">Logged in as</p>
+            <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
+
+            <form method="POST" action="{{ route('logout') }}" class="mt-4">
                 @csrf
-                <button class="text-red-500 border border-red-500 px-3 py-1 rounded-md text-sm hover:bg-red-50">
+                <button class="text-red-500 text-sm hover:text-red-600">
                     Logout
                 </button>
             </form>
         </div>
-    </nav>
 
-    <!-- Page Content -->
-    <main class="max-w-7xl mx-auto mt-10 px-6">
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 p-10">
         @yield('content')
     </main>
 
-    <!-- Scripts Stack (IMPORTANT) -->
-    @stack('scripts')
+</div>
 
-</body>
-</html>
+@endsection
