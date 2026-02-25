@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Technology;
 use App\Models\Role;
+use App\Models\MentorAssignment;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -58,5 +59,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function technology(){
         return $this->belongsTo(Technology::class);
+    }
+
+
+    public function mentorAssignments(){
+        return $this->hasMany(MentorAssignment::class,'intern_id');
+    }
+
+    public function currentMentorAssignment(){
+        return $this->hasOne(MentorAssignment::class,'intern_id')->where('is_active', true);
     }
 }
