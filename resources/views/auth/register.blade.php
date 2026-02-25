@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/css/app.css'])
 </head>
+
 <body class="bg-gray-100">
 
 <div class="min-h-screen flex items-center justify-center px-6">
@@ -24,15 +25,11 @@
                    class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
                    required>
 
-            @error('name') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
-
             <input type="email" name="email"
                    value="{{ old('email') }}"
                    placeholder="Email Address"
                    class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
                    required>
-
-            @error('email') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
 
             <input type="password" name="password"
                    placeholder="Password"
@@ -45,7 +42,8 @@
                    required>
 
             <select name="role" id="role"
-                    class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+                    class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                    required>
                 <option value="">Select Role</option>
                 @foreach ($roles as $role)
                     <option value="{{ $role->name }}"
@@ -79,12 +77,25 @@
                     Sign in
                 </a>
             </p>
+
         </form>
 
     </div>
 </div>
 
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true
+});
+
+// Show Technology dropdown only for intern
 document.addEventListener('DOMContentLoaded', function(){
     const roleSelect = document.getElementById('role');
     const techWrapper = document.getElementById('technology-wrapper');
@@ -101,6 +112,33 @@ document.addEventListener('DOMContentLoaded', function(){
     roleSelect.addEventListener('change', toggleTechnology);
 });
 </script>
+
+@if(session('success'))
+<script>
+    Toast.fire({
+        icon: 'success',
+        title: "{{ session('success') }}"
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Toast.fire({
+        icon: 'error',
+        title: "{{ session('error') }}"
+    });
+</script>
+@endif
+
+@if($errors->any())
+<script>
+    Toast.fire({
+        icon: 'error',
+        title: "{{ $errors->first() }}"
+    });
+</script>
+@endif
 
 </body>
 </html>
