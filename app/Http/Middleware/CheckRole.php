@@ -19,7 +19,7 @@ class CheckRole
         $user = $request->user();
 
         if($user->role->name !== $role){
-            abort(403);
+            return redirect()->route($user->role->name. '.dashboard');
         }
         return $next($request);
     }
