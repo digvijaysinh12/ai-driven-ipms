@@ -23,7 +23,7 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('hr.dashboard', compact('users'));
+        return view('hr.approvals', compact('users'));
     }
 
     /**
@@ -43,7 +43,7 @@ class DashboardController extends Controller
             ->where('status', 'rejected')
             ->get();
 
-        return view('hr.users', compact(
+        return view('hr.dashboard', compact(
             'pendingUsers',
             'approvedUsers',
             'rejectedUsers'
