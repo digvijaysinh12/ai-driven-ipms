@@ -39,6 +39,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required','string','exists:roles,name'],
             'technology_id' => [
+                'nullable',
                 'required_if:role,intern',
                 'exists:technologies,id'
             ]
