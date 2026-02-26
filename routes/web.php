@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\HR\DashboardController;
+use App\Http\Controllers\HR\DashboardController as HRDashboardController;
+use App\Http\Controllers\Intern\DashboardController as InternDashboardController;
 use App\Http\Controllers\HR\MentorAssignmentController;
 
 /*
@@ -15,17 +16,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Default Dashboard (Optional)
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'approved'])
-  ->name('dashboard');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +23,7 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth','verified','approved','checkrole:intern'])
+Route::middleware(['auth','verified','approved','checkrole:intern','ensureNotAssigned'])
     ->prefix('intern')
     ->name('intern.')
     ->group(function(){
@@ -56,9 +46,8 @@ Route::middleware(['auth','verified','approved','assigned','checkrole:intern'])
     ->name('intern.')
     ->group(function(){
 
-        Route::get('/dashboard', function(){
-            return view('intern.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [InternDashboardController::class, 'index'])
+            ->name('dashboard');
 
 });
 
@@ -99,16 +88,16 @@ Route::middleware(['auth','verified','checkrole:hr'])
     ->name('hr.')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'users'])
+        Route::get('/dashboard', [HRDashboardController::class, 'users'])
             ->name('dashboard');
 
-        Route::get('/users', [DashboardController::class, 'index'])
+        Route::get('/users', [HRDashboardController::class, 'index'])
             ->name('users');
 
-        Route::patch('/users/{id}/approve', [DashboardController::class, 'approve'])
+        Route::patch('/users/{id}/approve', [HRDashboardController::class, 'approve'])
             ->name('users.approve');
 
-        Route::patch('/users/{id}/reject', [DashboardController::class, 'reject'])
+        Route::patch('/users/{id}/reject', [HRDashboardController::class, 'reject'])
             ->name('users.reject');
 
         Route::post('/assigned-mentor', [MentorAssignmentController::class, 'assign'])
