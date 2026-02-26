@@ -14,7 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'checkrole' => \App\Http\Middleware\CheckRole::class,
             'approved' => \App\Http\Middleware\CheckApproved::class,
-            'assigned' => \App\Http\Middleware\CheckAssigned::class
+            'assigned' => \App\Http\Middleware\CheckAssigned::class,
+            'ensureNotAssigned' => \App\Http\Middleware\EnsureNotAssigned::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
