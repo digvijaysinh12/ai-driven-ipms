@@ -16,18 +16,24 @@
         </h1>
 
         <div class="space-x-6 text-sm font-medium">
+
             @auth
-                <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800">
+                <a href="{{ route(strtolower(auth()->user()->role->name) . '.dashboard') }}"
+                   class="text-gray-600 hover:text-indigo-600">
                     Dashboard
                 </a>
             @else
-                <a href="{{ route('login') }}" class="text-gray-600 hover:text-indigo-600">
+                <a href="{{ route('login') }}"
+                   class="text-gray-600 hover:text-indigo-600">
                     Login
                 </a>
-                <a href="{{ route('register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+
+                <a href="{{ route('register') }}"
+                   class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
                     Register
                 </a>
             @endauth
+
         </div>
     </div>
 </header>
@@ -46,6 +52,7 @@
                 HR approvals, mentor supervision, performance tracking, and AI-powered evaluations.
             </p>
 
+            @guest
             <div class="flex space-x-4">
                 <a href="{{ route('register') }}"
                    class="bg-indigo-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-indigo-700">
@@ -57,6 +64,7 @@
                     Sign In
                 </a>
             </div>
+            @endguest
         </div>
 
         <div class="bg-white shadow-lg p-8 rounded-lg border">
@@ -88,7 +96,6 @@
 
         <div class="grid md:grid-cols-3 gap-10 text-sm">
 
-            <!-- HR -->
             <div class="border rounded-lg p-6 shadow-sm">
                 <h3 class="font-semibold text-lg mb-4 text-indigo-600">HR</h3>
                 <ul class="space-y-2 text-gray-600">
@@ -99,7 +106,6 @@
                 </ul>
             </div>
 
-            <!-- Mentor -->
             <div class="border rounded-lg p-6 shadow-sm">
                 <h3 class="font-semibold text-lg mb-4 text-indigo-600">Mentor / Team Lead</h3>
                 <ul class="space-y-2 text-gray-600">
@@ -110,7 +116,6 @@
                 </ul>
             </div>
 
-            <!-- Intern -->
             <div class="border rounded-lg p-6 shadow-sm">
                 <h3 class="font-semibold text-lg mb-4 text-indigo-600">Intern</h3>
                 <ul class="space-y-2 text-gray-600">
@@ -141,7 +146,6 @@
     </div>
 </section>
 
-<!-- Footer -->
 <footer class="bg-white border-t py-6 text-center text-xs text-gray-500">
     © {{ date('Y') }} AI Driven Internship Management System. All rights reserved.
 </footer>
