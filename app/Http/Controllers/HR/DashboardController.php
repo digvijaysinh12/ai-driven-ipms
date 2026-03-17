@@ -4,14 +4,20 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\MentorAssignment;
+use App\Models\Topic;
+use App\Models\Question;
+use App\Models\InternTopicAssignment;
 
 class DashboardController extends Controller
 {
-    /**
-     * HR Dashboard
-     * Show only pending Intern & Mentor users
-     */
+
+    /*
+    |---------------------------------------
+    | Pending approvals page
+    |---------------------------------------
+    */
+
     public function index()
     {
         $users = User::with('role')
@@ -26,67 +32,119 @@ class DashboardController extends Controller
         return view('hr.approvals', compact('users'));
     }
 
-    /**
-     * Show all users categorized (Optional page)
-     */
+
+    /*
+    |---------------------------------------
+    | HR Dashboard
+    |---------------------------------------
+    */
+
     public function users()
     {
-        $pendingUsers = User::with('role')
-            ->where('status', 'pending')
-            ->get();
 
-        $approvedUsers = User::with('role')
-            ->where('status', 'approved')
-            ->get();
+        // User stats
+        $totalUsers = User::count();
 
-        $rejectedUsers = User::with('role')
-            ->where('status', 'rejected')
-            ->get();
+        $totalInterns = User::where('role_id',3)->count();
 
-        return view('hr.dashboard', compact(
+        $totalMentors = User::where('role_id',2)->count();
+
+
+        // Approval stats
+        $pendingUsers = User::where('status','pending')->count();
+
+        $approvedUsers = User::where('status','approved')->count();
+
+        $rejectedUsers = User::where('status','rejected')->count();
+
+
+        // Internship stats
+        $assignedInterns = MentorAssignment::count();
+
+        $topics = Topic::count();
+
+        $questions = Question::count();
+
+        $assignments = InternTopicAssignment::count();
+
+        $submitted = InternTopicAssignment::where('status','submitted')->count();
+
+        $evaluated = InternTopicAssignment::where('status','evaluated')->count();
+
+
+        return view('hr.dashboard',compact(
+
+            'totalUsers',
+            'totalInterns',
+            'totalMentors',
+
             'pendingUsers',
             'approvedUsers',
-            'rejectedUsers'
+            'rejectedUsers',
+
+            'assignedInterns',
+            'topics',
+            'questions',
+
+            'assignments',
+            'submitted',
+            'evaluated'
+
         ));
+
     }
 
-    /**
-     * Approve user
-     */
+
+    /*
+    |---------------------------------------
+    | Approve user
+    |---------------------------------------
+    */
+
     public function approve($id)
     {
         $user = User::findOrFail($id);
 
-        // Extra safety: HR cannot approve HR accounts
         if ($user->role->name === 'hr') {
-            return redirect()->back()->with('error', 'Cannot approve HR account.');
+            return back()->with('error','Cannot approve HR account');
         }
 
         if(!$user->email_verified_at){
-            return redirect()->back()->with('error','User email is not verified.');
+            return back()->with('error','User email not verified');
         }
 
         $user->update([
             'status' => 'approved'
         ]);
-        return redirect()->back()->with('success', 'User approved successfully.');
+
+        return back()->with('success','User approved successfully');
     }
 
-    /**
-     * Reject user
-     */
+
+    /*
+    |---------------------------------------
+    | Reject user
+    |---------------------------------------
+    */
+
     public function reject($id)
     {
         $user = User::findOrFail($id);
 
         if ($user->role->name === 'hr') {
-            return redirect()->back()->with('error', 'Cannot reject HR account.');
+            return back()->with('error','Cannot reject HR account');
         }
 
         $user->update([
             'status' => 'rejected'
         ]);
 
-        return redirect()->back()->with('success', 'User rejected successfully.');
+        return back()->with('success','User rejected successfully');
     }
+
+        public function internProgress()
+    {
+        return view('hr.intern_progress');
+    }
+
 }
