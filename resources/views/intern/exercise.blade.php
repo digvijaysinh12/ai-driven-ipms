@@ -23,14 +23,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/addon/edit/matchbrackets.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --border-radius: 8px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: #0f0f0f;
-            color: #e8e8e8;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-900);
+            color: var(--gray-100);
             height: 100vh;
             overflow: hidden;
             user-select: none;
@@ -40,81 +62,121 @@
         /* ── Exam shell ── */
         .exam-shell {
             display: grid;
-            grid-template-rows: 52px 1fr;
+            grid-template-rows: 60px 1fr;
             height: 100vh;
         }
 
         /* ── Top bar ── */
         .exam-topbar {
-            background: #1a1a1a;
-            border-bottom: 1px solid #2a2a2a;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-700);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            gap: 20px;
+            padding: 0 2rem;
+            gap: 1.5rem;
+            box-shadow: var(--shadow);
         }
 
         .exam-topic {
-            font-size: 13px;
-            font-weight: 500;
-            color: #e8e8e8;
-            letter-spacing: -0.01em;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-100);
+            letter-spacing: -0.025em;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .exam-type-badge {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: #888;
-            letter-spacing: 0.08em;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            background: var(--gray-700);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
             text-transform: uppercase;
-            background: #2a2a2a;
-            padding: 3px 10px;
-            border-radius: 2px;
+            letter-spacing: 0.05em;
+            font-weight: 500;
         }
 
         /* Question pill nav */
         .q-pills {
             display: flex;
-            gap: 4px;
+            gap: 0.5rem;
             flex: 1;
             justify-content: center;
             overflow-x: auto;
             scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
-        .q-pills::-webkit-scrollbar { display: none; }
+        .q-pills::-webkit-scrollbar {
+            display: none;
+        }
 
         .q-pill {
-            width: 28px; height: 28px;
-            border-radius: 2px;
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            display: flex; align-items: center; justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--border-radius);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            border: 1px solid #2a2a2a;
-            background: #1a1a1a;
-            color: #666;
-            transition: all 0.12s;
+            border: 1px solid var(--gray-600);
+            background: var(--gray-700);
+            color: var(--gray-400);
+            transition: all 0.2s ease;
             flex-shrink: 0;
+            position: relative;
         }
 
-        .q-pill:hover  { background: #2a2a2a; color: #aaa; }
-        .q-pill.active { background: #e8e8e8; color: #1a1a1a; border-color: #e8e8e8; }
-        .q-pill.answered { background: #1a3a1a; color: #4a9a4a; border-color: #2a5a2a; }
-        .q-pill.answered.active { background: #4a9a4a; color: #fff; border-color: #4a9a4a; }
+        .q-pill:hover {
+            background: var(--gray-600);
+            color: var(--gray-200);
+            border-color: var(--gray-500);
+        }
+
+        .q-pill.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .q-pill.answered {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .q-pill.answered.active {
+            background: #059669;
+            border-color: #059669;
+        }
 
         .exam-exit-link {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: #555;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-400);
             text-decoration: none;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             white-space: nowrap;
-            transition: color 0.12s;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-600);
         }
 
-        .exam-exit-link:hover { color: #aaa; }
+        .exam-exit-link:hover {
+            color: var(--gray-200);
+            background: var(--gray-700);
+            border-color: var(--gray-500);
+        }
 
         /* ── Main area ── */
         .exam-main {
@@ -126,221 +188,293 @@
 
         /* ── Left: Question ── */
         .q-panel {
-            background: #141414;
-            border-right: 1px solid #242424;
+            background: var(--gray-800);
+            border-right: 1px solid var(--gray-700);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .q-panel-header {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid #242424;
+            padding: 1.5rem 2rem 1rem;
+            border-bottom: 1px solid var(--gray-700);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
 
         .q-index {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: #555;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--gray-400);
+            font-weight: 500;
         }
 
         .q-type-tag {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: #666;
-            background: #222;
-            padding: 2px 8px;
-            border-radius: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-300);
+            background: var(--gray-700);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
+            font-weight: 500;
         }
 
         .q-body {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 2rem;
             scrollbar-width: thin;
-            scrollbar-color: #2a2a2a #141414;
+            scrollbar-color: var(--gray-600) var(--gray-800);
+        }
+
+        .q-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .q-body::-webkit-scrollbar-track {
+            background: var(--gray-800);
+        }
+
+        .q-body::-webkit-scrollbar-thumb {
+            background: var(--gray-600);
+            border-radius: 3px;
+        }
+
+        .q-body::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
         }
 
         .q-statement {
-            font-size: 15px;
-            color: #e8e8e8;
+            font-size: 1.125rem;
+            color: var(--gray-100);
             line-height: 1.75;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
             user-select: none;
         }
 
         .code-snippet {
-            background: #0a0a0a;
-            border: 1px solid #2a2a2a;
-            padding: 16px 20px;
-            border-radius: 2px;
-            font-family: 'DM Mono', monospace;
-            font-size: 13px;
-            line-height: 1.65;
-            color: #c8c8c8;
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--gray-200);
             overflow-x: auto;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
             user-select: none;
+            box-shadow: var(--shadow);
         }
 
         /* MCQ */
         .mcq-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.75rem;
         }
 
         .mcq-label {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 12px 16px;
-            border: 1px solid #2a2a2a;
-            border-radius: 2px;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border: 1px solid var(--gray-600);
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 14px;
-            color: #ccc;
+            font-size: 1rem;
+            color: var(--gray-300);
             line-height: 1.5;
-            transition: background 0.1s, border-color 0.1s;
+            transition: all 0.2s ease;
+            background: var(--gray-700);
         }
 
-        .mcq-label:hover { background: #1e1e1e; border-color: #3a3a3a; }
+        .mcq-label:hover {
+            background: var(--gray-600);
+            border-color: var(--gray-500);
+            color: var(--gray-100);
+        }
 
-        .mcq-label input[type="radio"] { display: none; }
+        .mcq-label input[type="radio"] {
+            display: none;
+        }
 
         .mcq-label.selected {
-            background: #1a2a1a;
-            border-color: #3a7a3a;
-            color: #e8e8e8;
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success-color);
+            color: var(--gray-100);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
         }
 
         .option-key {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: #555;
-            min-width: 18px;
-            padding-top: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--gray-400);
+            min-width: 1.25rem;
+            padding-top: 0.125rem;
+            font-weight: 600;
         }
 
-        .mcq-label.selected .option-key { color: #4a9a4a; }
+        .mcq-label.selected .option-key {
+            color: var(--success-color);
+        }
 
         /* True/False */
         .tf-options {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
         }
 
         .tf-btn {
             flex: 1;
-            padding: 14px;
-            border: 1px solid #2a2a2a;
-            border-radius: 2px;
-            background: #1a1a1a;
-            color: #888;
-            font-size: 14px;
-            font-family: 'DM Sans', sans-serif;
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--gray-600);
+            border-radius: var(--border-radius);
+            background: var(--gray-700);
+            color: var(--gray-300);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
             cursor: pointer;
             text-align: center;
-            transition: all 0.12s;
+            transition: all 0.2s ease;
         }
 
-        .tf-btn:hover { background: #222; color: #ccc; border-color: #3a3a3a; }
-        .tf-btn.selected { background: #1a2a1a; border-color: #3a7a3a; color: #4a9a4a; }
+        .tf-btn:hover {
+            background: var(--gray-600);
+            color: var(--gray-100);
+            border-color: var(--gray-500);
+        }
+
+        .tf-btn.selected {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
 
         /* Text answer */
         .text-input {
             width: 100%;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 2px;
-            padding: 14px 16px;
-            font-size: 14px;
-            font-family: 'DM Sans', sans-serif;
-            color: #e8e8e8;
+            background: var(--gray-700);
+            border: 1px solid var(--gray-600);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-100);
             outline: none;
-            resize: none;
-            min-height: 100px;
-            transition: border-color 0.12s;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.2s ease;
             line-height: 1.6;
         }
 
-        .text-input:focus { border-color: #3a3a3a; }
+        .text-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .text-input::placeholder {
+            color: var(--gray-500);
+        }
 
         /* Already answered banner */
         .answered-banner {
-            background: #1a2a1a;
-            border: 1px solid #2a5a2a;
-            border-radius: 2px;
-            padding: 10px 14px;
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: #4a9a4a;
-            letter-spacing: 0.04em;
-            margin-bottom: 14px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--success-color);
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            font-weight: 500;
         }
 
         /* ── Nav footer ── */
         .q-footer {
-            padding: 14px 24px;
-            border-top: 1px solid #242424;
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--gray-700);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--gray-800);
         }
 
         .nav-btn {
-            background: #2a2a2a;
-            color: #aaa;
-            border: none;
-            padding: 9px 20px;
-            border-radius: 2px;
-            font-size: 13px;
-            font-family: 'DM Sans', sans-serif;
+            background: var(--gray-700);
+            color: var(--gray-300);
+            border: 1px solid var(--gray-600);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.12s, color 0.12s;
+            transition: all 0.2s ease;
         }
 
-        .nav-btn:hover { background: #3a3a3a; color: #e8e8e8; }
-        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .nav-btn:hover {
+            background: var(--gray-600);
+            color: var(--gray-100);
+            border-color: var(--gray-500);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-800);
+            color: var(--gray-500);
+        }
 
         .save-btn {
-            background: #e8e8e8;
-            color: #1a1a1a;
-            border: none;
-            padding: 9px 24px;
-            border-radius: 2px;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: 'DM Sans', sans-serif;
+            background: var(--primary-color);
+            color: white;
+            border: 1px solid var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: background 0.12s;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
         }
 
-        .save-btn:hover { background: #fff; }
-        .save-btn.saving { opacity: 0.6; }
+        .save-btn:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .save-btn.saving {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
 
         /* ── Right: Code editor / output ── */
         .editor-panel {
-            background: #0f0f0f;
+            background: var(--gray-900);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .editor-topbar {
-            background: #1a1a1a;
-            border-bottom: 1px solid #242424;
-            padding: 0 16px;
-            height: 40px;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-700);
+            padding: 0 1.25rem;
+            height: 3rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 1rem;
         }
 
         .editor-tabs {
@@ -349,46 +483,73 @@
         }
 
         .editor-tab {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            color: #555;
-            padding: 0 14px;
-            height: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            padding: 0 1rem;
+            height: 3rem;
             display: flex;
             align-items: center;
             cursor: pointer;
             border-bottom: 2px solid transparent;
-            letter-spacing: 0.04em;
-            transition: color 0.12s;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
-        .editor-tab.active { color: #e8e8e8; border-bottom-color: #e8e8e8; }
+        .editor-tab.active {
+            color: var(--gray-100);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .editor-tab:hover {
+            color: var(--gray-200);
+        }
 
         .run-btn {
-            background: #2a3a2a;
-            color: #4aaa4a;
-            border: 1px solid #2a5a2a;
-            padding: 5px 16px;
-            border-radius: 2px;
-            font-size: 12px;
-            font-family: 'DM Mono', monospace;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            padding: 0.375rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
             cursor: pointer;
-            letter-spacing: 0.04em;
-            transition: background 0.12s;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
         }
 
-        .run-btn:hover { background: #1a4a1a; }
+        .run-btn:hover {
+            background: var(--success-color);
+            color: white;
+        }
 
         /* CodeMirror overrides */
         .CodeMirror {
             height: 100%;
-            font-family: 'DM Mono', monospace;
-            font-size: 13.5px;
-            line-height: 1.65;
-            background: #0f0f0f !important;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            background: var(--gray-900) !important;
         }
 
-        .CodeMirror-scroll { padding-bottom: 20px; }
+        .CodeMirror-scroll {
+            padding-bottom: 1.25rem;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--primary-color) !important;
+        }
+
+        .CodeMirror-gutters {
+            background: var(--gray-800) !important;
+            border-right: 1px solid var(--gray-700) !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: var(--gray-500) !important;
+        }
 
         .editor-cm-wrap {
             flex: 1;
@@ -399,74 +560,147 @@
         /* Output pane */
         .output-pane {
             flex: 1;
-            background: #0a0a0a;
+            background: var(--gray-900);
             display: none;
             flex-direction: column;
         }
 
-        .output-pane.visible { display: flex; }
+        .output-pane.visible {
+            display: flex;
+        }
 
         .output-header {
-            padding: 10px 16px;
-            border-bottom: 1px solid #1a1a1a;
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: #555;
-            letter-spacing: 0.08em;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--gray-700);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            letter-spacing: 0.05em;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 500;
         }
 
         .output-clear {
             background: none;
             border: none;
-            color: #444;
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
+            color: var(--gray-500);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
             cursor: pointer;
-            letter-spacing: 0.06em;
-            transition: color 0.12s;
+            letter-spacing: 0.05em;
+            transition: color 0.2s ease;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius);
         }
 
-        .output-clear:hover { color: #888; }
+        .output-clear:hover {
+            color: var(--gray-300);
+            background: var(--gray-800);
+        }
 
         #output-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
-            font-family: 'DM Mono', monospace;
-            font-size: 13px;
-            line-height: 1.7;
-            color: #d4d4d4;
+            padding: 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--gray-200);
             scrollbar-width: thin;
-            scrollbar-color: #2a2a2a #0a0a0a;
+            scrollbar-color: var(--gray-600) var(--gray-900);
             white-space: pre-wrap;
         }
 
-        .output-error { color: #e87070; }
+        #output-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #output-content::-webkit-scrollbar-track {
+            background: var(--gray-900);
+        }
+
+        #output-content::-webkit-scrollbar-thumb {
+            background: var(--gray-600);
+            border-radius: 3px;
+        }
+
+        #output-content::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
+        }
+
+        .output-error {
+            color: var(--danger-color);
+        }
 
         /* ── Non-coding answer panel (blank/output) ── */
         .plain-answer-panel {
             flex: 1;
-            padding: 20px;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 1rem;
         }
 
         .answer-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
-            color: #555;
-            letter-spacing: 0.08em;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            letter-spacing: 0.05em;
             text-transform: uppercase;
+            font-weight: 500;
         }
 
-        /* Hide scrollbars on panel body for clean look */
-        .q-body::-webkit-scrollbar { width: 4px; }
-        .q-body::-webkit-scrollbar-track { background: #141414; }
-        .q-body::-webkit-scrollbar-thumb { background: #2a2a2a; }
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .exam-main {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+
+            .q-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--gray-700);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .exam-topbar {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                height: auto;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .exam-topic {
+                max-width: none;
+            }
+
+            .q-pills {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start;
+                overflow-x: auto;
+            }
+
+            .q-panel-header,
+            .q-body,
+            .q-footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .editor-topbar {
+                padding: 0 1rem;
+            }
+
+            .plain-answer-panel {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -554,7 +788,7 @@
                     rows="5"
                     autocomplete="off"
                     spellcheck="false"></textarea>
-                <div style="font-family:'DM Mono',monospace;font-size:10px;color:#444;margin-top:4px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#444;margin-top:4px;">
                     Tip: Match spacing, capitalization and line breaks exactly
                 </div>
             </div>
@@ -574,7 +808,7 @@
             @else
             {{-- MCQ and true_false: answer captured in left panel --}}
             <div class="plain-answer-panel" style="justify-content:center;align-items:center;text-align:center;">
-                <div style="font-family:'DM Mono',monospace;font-size:11px;color:#444;line-height:1.8;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#444;line-height:1.8;">
                     SELECT YOUR ANSWER<br>ON THE LEFT PANEL
                 </div>
             </div>

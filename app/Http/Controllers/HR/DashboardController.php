@@ -8,6 +8,7 @@ use App\Models\MentorAssignment;
 use App\Models\Topic;
 use App\Models\Question;
 use App\Models\InternTopicAssignment;
+use App\Models\Submission;
 
 class DashboardController extends Controller
 {
@@ -41,57 +42,38 @@ class DashboardController extends Controller
 
     public function users()
     {
-
         // User stats
-        $totalUsers = User::count();
-
-        $totalInterns = User::where('role_id',3)->count();
-
-        $totalMentors = User::where('role_id',2)->count();
-
+        $totalUsers   = User::count();
+        $totalInterns = User::where('role_id', 3)->count();
+        $totalMentors = User::where('role_id', 2)->count();
 
         // Approval stats
-        $pendingUsers = User::where('status','pending')->count();
-
-        $approvedUsers = User::where('status','approved')->count();
-
-        $rejectedUsers = User::where('status','rejected')->count();
-
+        $pendingUsers  = User::where('status', 'pending')->count();
+        $approvedUsers = User::where('status', 'approved')->count();
+        $rejectedUsers = User::where('status', 'rejected')->count();
 
         // Internship stats
         $assignedInterns = MentorAssignment::count();
+        $topics          = Topic::count();
+        $questions       = Question::count();
+        $assignments     = InternTopicAssignment::count();
+        $submitted       = InternTopicAssignment::where('status', 'submitted')->count();
+        $evaluated       = InternTopicAssignment::where('status', 'evaluated')->count();
 
-        $topics = Topic::count();
-
-        $questions = Question::count();
-
-        $assignments = InternTopicAssignment::count();
-
-        $submitted = InternTopicAssignment::where('status','submitted')->count();
-
-        $evaluated = InternTopicAssignment::where('status','evaluated')->count();
-
-
-        return view('hr.dashboard',compact(
-
+        return view('hr.dashboard', compact(
             'totalUsers',
             'totalInterns',
             'totalMentors',
-
             'pendingUsers',
             'approvedUsers',
             'rejectedUsers',
-
             'assignedInterns',
             'topics',
             'questions',
-
             'assignments',
             'submitted',
             'evaluated'
-
         ));
-
     }
 
 
@@ -106,18 +88,16 @@ class DashboardController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->role->name === 'hr') {
-            return back()->with('error','Cannot approve HR account');
+            return back()->with('error', 'Cannot approve HR account');
         }
 
-        if(!$user->email_verified_at){
-            return back()->with('error','User email not verified');
+        if (!$user->email_verified_at) {
+            return back()->with('error', 'User email not verified');
         }
 
-        $user->update([
-            'status' => 'approved'
-        ]);
+        $user->update(['status' => 'approved']);
 
-        return back()->with('success','User approved successfully');
+        return back()->with('success', 'User approved successfully');
     }
 
 
@@ -132,19 +112,64 @@ class DashboardController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->role->name === 'hr') {
-            return back()->with('error','Cannot reject HR account');
+            return back()->with('error', 'Cannot reject HR account');
         }
 
-        $user->update([
-            'status' => 'rejected'
-        ]);
+        $user->update(['status' => 'rejected']);
 
-        return back()->with('success','User rejected successfully');
+        return back()->with('success', 'User rejected successfully');
     }
 
-        public function internProgress()
+
+    /*
+    |---------------------------------------
+    | Intern progress overview (generic)
+    |---------------------------------------
+    */
+
+    public function internProgress()
     {
         return view('hr.intern_progress');
+    }
+
+
+    /*
+    |---------------------------------------
+    | Intern progress detail (by intern ID)
+    |---------------------------------------
+    */
+
+    public function internProgressShow($id)
+    {
+        $intern = User::with('role')->findOrFail($id);
+
+        abort_unless($intern->role->name === 'intern', 404);
+
+        // Mentor assignment
+        $mentorAssignment = MentorAssignment::with('mentor')
+            ->where('intern_id', $id)
+            ->where('is_active', 1)
+            ->first();
+
+        // Topic assignments with topic
+        $topicAssignments = InternTopicAssignment::with('topic')
+            ->where('intern_id', $id)
+            ->latest('assigned_at')
+            ->get();
+
+        // Submission stats
+        $totalSubmissions = Submission::where('intern_id', $id)->count();
+        $reviewedCount    = Submission::where('intern_id', $id)
+            ->where('status', 'reviewed')
+            ->count();
+
+        return view('hr.intern_progress_show', compact(
+            'intern',
+            'mentorAssignment',
+            'topicAssignments',
+            'totalSubmissions',
+            'reviewedCount'
+        ));
     }
 
 }

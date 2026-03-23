@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MentorAssignment extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'intern_id',
         'mentor_id',

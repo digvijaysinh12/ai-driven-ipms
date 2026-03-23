@@ -9,6 +9,10 @@ use App\Models\Topic;
 use App\Models\Question;
 use App\Models\ReferenceSolution;
 use App\Services\GroqQuestionService;
+use App\Exceptions\AIServiceException;
+use App\Events\TopicPublished;
+use App\Jobs\GenerateQuestionsJob;
+use App\Http\Requests\StoreTopicRequest;
 
 class TopicController extends Controller
 {
@@ -20,7 +24,7 @@ class TopicController extends Controller
         $topics = Topic::where('mentor_id', Auth::id())
             ->withCount('questions')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('mentor.topics.index', compact('topics'));
     }
@@ -36,17 +40,8 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     // Store new topic
     // ─────────────────────────────────────────────
-    public function store(Request $request)
+    public function store(StoreTopicRequest $request)
     {
-        $request->validate([
-            'title'           => 'required|string|max:255',
-            'description'     => 'nullable|string',
-            'mcq_count'       => 'nullable|integer|min:0|max:50',
-            'blank_count'     => 'nullable|integer|min:0|max:50',
-            'true_false_count'=> 'nullable|integer|min:0|max:50',
-            'output_count'    => 'nullable|integer|min:0|max:50',
-            'coding_count'    => 'nullable|integer|min:0|max:50',
-        ]);
 
         Topic::create([
             'mentor_id'        => Auth::id(),
@@ -70,7 +65,7 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     public function show(Topic $topic)
     {
-        $this->authorizeTopic($topic);
+        $this->authorize('view', $topic);
 
         // Count per type for the mosaic cards
         $typeCounts = $topic->questions()
@@ -86,7 +81,7 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     public function showQuestions(Topic $topic, string $type)
     {
-        $this->authorizeTopic($topic);
+        $this->authorize('view', $topic);
 
         $validTypes = ['mcq', 'blank', 'true_false', 'output', 'coding'];
         abort_unless(in_array($type, $validTypes), 404);
@@ -104,7 +99,7 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     public function generateAI(Topic $topic, GroqQuestionService $aiService)
     {
-        $this->authorizeTopic($topic);
+        $this->authorize('update', $topic);
 
         // Only allow generation on draft or re-generation on ai_generated
         if ($topic->status === 'published') {
@@ -129,20 +124,12 @@ class TopicController extends Controller
         foreach ($modules as $type => $count) {
             if ($count <= 0) continue;
 
-            try {
-                $aiService->generateQuestions($topic, $type, $count);
-            } catch (\Exception $e) {
-                $errors[] = "Failed to generate {$type} questions: " . $e->getMessage();
-            }
+            GenerateQuestionsJob::dispatch($topic, $type, $count);
         }
 
         $topic->update(['status' => 'ai_generated']);
 
-        if (!empty($errors)) {
-            return back()->with('error', implode(' | ', $errors));
-        }
-
-        return back()->with('success', 'AI questions generated successfully. Review them before publishing.');
+        return back()->with('success', 'AI question generation started. Check back shortly for results.');
     }
 
     // ─────────────────────────────────────────────
@@ -150,13 +137,15 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     public function publish(Topic $topic)
     {
-        $this->authorizeTopic($topic);
+        $this->authorize('publish', $topic);
 
         if ($topic->questions()->count() === 0) {
             return back()->with('error', 'Cannot publish a topic with no questions.');
         }
 
         $topic->update(['status' => 'published']);
+
+        event(new TopicPublished($topic));
 
         return back()->with('success', 'Topic published successfully. It can now be assigned to interns.');
     }
@@ -166,7 +155,7 @@ class TopicController extends Controller
     // ─────────────────────────────────────────────
     public function destroy(Topic $topic)
     {
-        $this->authorizeTopic($topic);
+        $this->authorize('delete', $topic);
 
         if ($topic->status === 'published') {
             return back()->with('error', 'Published topics cannot be deleted.');
@@ -177,15 +166,5 @@ class TopicController extends Controller
         return redirect()
             ->route('mentor.topics.index')
             ->with('success', 'Topic deleted.');
-    }
-
-    // ─────────────────────────────────────────────
-    // Private helper — abort if topic doesn't belong to this mentor
-    // ─────────────────────────────────────────────
-    private function authorizeTopic(Topic $topic): void
-    {
-        if ($topic->mentor_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this topic.');
-        }
     }
 }

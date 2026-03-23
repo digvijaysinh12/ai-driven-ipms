@@ -74,11 +74,19 @@ Route::prefix('intern')
 
         // PHP code runner for coding questions
         Route::post('/run-code', [SubmissionController::class, 'runCode'])
+            ->middleware('throttle:code-executions')
             ->name('run.code');
 
         // Submissions list (scores hidden until mentor reviews)
         Route::get('/submissions', [SubmissionController::class, 'index'])
             ->name('submissions');
+
+        // Placeholder routes to satisfy sidebar links (implement later)
+        Route::get('/attendance', fn () => 'Attendance page coming soon')
+            ->name('attendance');
+
+        Route::get('/performance', fn () => 'Performance page coming soon')
+            ->name('performance');
     });
 
 
@@ -123,6 +131,7 @@ Route::middleware(['auth', 'verified', 'approved', 'checkrole:mentor'])
 
         // AI question generation
         Route::post('topics/{topic}/generate-ai', [TopicController::class, 'generateAI'])
+            ->middleware('throttle:ai-generations')
             ->name('topics.generateAI');
 
         // Publish topic
@@ -175,13 +184,16 @@ Route::middleware(['auth', 'verified', 'checkrole:hr'])
             ->name('mentor.assignments');
 
         Route::get('/intern-mentor', [MentorAssignmentController::class, 'index'])
-            ->name('hr.intern.mentor');
+            ->name('intern.mentor');
 
         Route::get('/intern-mentor-list', [MentorAssignmentController::class, 'list'])
             ->name('intern.mentor.list');
 
         Route::get('/intern-progress', [HRDashboardController::class, 'internProgress'])
             ->name('intern.progress');
+
+        Route::get('/intern-progress/{id}', [HRDashboardController::class, 'internProgressShow'])
+            ->name('intern.progress.show');
     });
 
 

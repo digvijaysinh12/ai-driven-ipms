@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Topic;
 use App\Models\InternTopicAssignment;
 
@@ -28,11 +29,13 @@ class TopicAssignController extends Controller
             ->get();
 
         // Only published topics by this mentor (ready to assign)
-        $topics = Topic::where('mentor_id', $mentorId)
-            ->where('status', 'published')
-            ->withCount('questions')
-            ->orderBy('title')
-            ->get();
+        $topics = Cache::remember("mentor.{$mentorId}.published_topics", 60*60, function () use ($mentorId) {
+            return Topic::where('mentor_id', $mentorId)
+                ->where('status', 'published')
+                ->withCount('questions')
+                ->orderBy('title')
+                ->get();
+        });
 
         return view('mentor.topics.assign', compact('interns', 'topics'));
     }
@@ -67,14 +70,16 @@ class TopicAssignController extends Controller
                 ->withErrors(['topic_id' => 'This topic is already assigned to this intern.']);
         }
 
-        InternTopicAssignment::create([
-            'intern_id'   => $request->intern_id,
-            'topic_id'    => $request->topic_id,
-            'assigned_by' => $mentorId,
-            'deadline'    => $request->deadline,
-            'status'      => 'assigned',
-            'assigned_at' => now(),
-        ]);
+        DB::transaction(function () use ($request, $mentorId) {
+            InternTopicAssignment::create([
+                'intern_id'   => $request->intern_id,
+                'topic_id'    => $request->topic_id,
+                'assigned_by' => $mentorId,
+                'deadline'    => $request->deadline,
+                'status'      => 'assigned',
+                'assigned_at' => now(),
+            ]);
+        });
 
         return redirect()
             ->route('mentor.topics.index')

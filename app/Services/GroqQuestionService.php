@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\Question;
 use App\Models\ReferenceSolution;
 use App\Models\Topic;
+use App\Exceptions\AIServiceException;
 
 class GroqQuestionService
 {
@@ -20,6 +22,8 @@ class GroqQuestionService
 
     public function generateQuestions(Topic $topic, string $type, int $count): bool
     {
+        Log::info("Starting AI question generation for topic {$topic->id}, type {$type}, count {$count}");
+
         $prompt = $this->buildPrompt($type, $count, $topic->title);
 
         $response = Http::withHeaders([
@@ -42,19 +46,19 @@ class GroqQuestionService
         ]);
 
         if (!$response->successful()) {
-            throw new \Exception('Groq API Error: ' . $response->body());
+            throw new AIServiceException('Groq API Error: ' . $response->body());
         }
 
         $text = $response->json('choices.0.message.content');
 
         if (!$text) {
-            throw new \Exception('Empty Groq response.');
+            throw new AIServiceException('Empty Groq response.');
         }
 
         $data = json_decode($text, true);
 
         if (!isset($data['questions'])) {
-            throw new \Exception('Invalid AI JSON structure.');
+            throw new AIServiceException('Invalid AI JSON structure.');
         }
 
         foreach ($data['questions'] as $item) {
@@ -94,6 +98,8 @@ class GroqQuestionService
                 ]);
             }
         }
+
+        Log::info("Successfully generated {$count} {$type} questions for topic {$topic->id}");
 
         return true;
     }

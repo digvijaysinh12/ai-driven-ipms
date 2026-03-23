@@ -254,4 +254,6 @@
     @endif
 </div>
 
+{{ $submissions->links() }}
+
 @endsection

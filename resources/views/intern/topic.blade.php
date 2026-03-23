@@ -1,303 +1,421 @@
-@extends('layouts.intern')
+﻿@extends('layouts.intern')
 
 @section('title', 'My Topic')
 
 @section('content')
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+    :root {
+        --primary-color: #2563eb;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --border-radius: 8px;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--gray-50);
+        color: var(--gray-900);
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
 
     .page-header {
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e5e5e5;
-        margin-bottom: 28px;
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-200);
     }
 
-    .page-title { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
 
     .page-meta {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px; color: #aaa;
-        margin-top: 4px; letter-spacing: 0.04em;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        margin-top: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    .deadline-pill {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px; color: #555;
-        background: #f0f0f0;
-        padding: 6px 14px;
-        border-radius: 2px;
+    .deadline-badge {
+        background-color: var(--gray-100);
+        color: var(--gray-700);
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-size: 0.75rem;
+        font-weight: 500;
+        font-family: 'JetBrains Mono', monospace;
         white-space: nowrap;
     }
 
-    .deadline-pill.overdue { background: #fdf0f0; color: #c0392b; }
+    .deadline-badge.overdue {
+        background-color: #fef2f2;
+        color: var(--danger-color);
+    }
 
-    /* ── Module grid ── */
     .module-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 1px;
-        background: #e5e5e5;
-        border: 1px solid #e5e5e5;
-        border-radius: 2px;
-        overflow: hidden;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .module-card {
-        background: #fff;
-        padding: 24px 22px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        transition: background 0.12s;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: all 0.2s ease;
         position: relative;
-    }
-
-    .module-card:hover { background: #fafafa; }
-
-    /* completed card */
-    .module-card.done { background: #f9fdf9; }
-    .module-card.done:hover { background: #f4fcf4; }
-
-    .module-type {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: #aaa;
-        margin-bottom: 10px;
-    }
-
-    .module-count {
-        font-family: 'DM Mono', monospace;
-        font-size: 32px;
-        font-weight: 400;
-        color: #1a1a1a;
-        line-height: 1;
-        margin-bottom: 2px;
-    }
-
-    .module-count-label {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        color: #bbb;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-
-    /* progress bar */
-    .module-progress {
-        margin: 14px 0 16px;
-        height: 2px;
-        background: #ebebeb;
-        border-radius: 1px;
         overflow: hidden;
     }
 
-    .module-progress-fill {
+    .module-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+
+    .module-card.completed {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-color: var(--success-color);
+    }
+
+    .module-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-completed {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-in-progress {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-not-started {
+        background-color: var(--gray-100);
+        color: var(--gray-600);
+    }
+
+    .module-type {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .module-count {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .module-label {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .progress-container {
+        margin: 1rem 0;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background-color: var(--gray-200);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
         height: 100%;
-        background: #1a1a1a;
-        border-radius: 1px;
+        background: linear-gradient(90deg, var(--primary-color) 0%, #3b82f6 100%);
+        border-radius: 3px;
         transition: width 0.3s ease;
     }
 
-    .module-progress-fill.full { background: #2ecc71; }
-
-    .module-progress-label {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        color: #aaa;
-        margin-top: -10px;
-        margin-bottom: 14px;
+    .progress-fill.completed {
+        background: linear-gradient(90deg, var(--success-color) 0%, #34d399 100%);
     }
 
-    /* start button */
-    .btn-start {
-        display: block;
-        text-align: center;
-        background: #1a1a1a;
-        color: #fff;
+    .progress-text {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 600;
         text-decoration: none;
-        padding: 9px 0;
-        border-radius: 2px;
-        font-size: 12px;
-        font-weight: 500;
-        font-family: 'DM Sans', sans-serif;
-        transition: background 0.12s;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
     }
 
-    .btn-start:hover { background: #333; }
-
-    .btn-start.done-btn {
-        background: #fff;
-        color: #2ecc71;
-        border: 1px solid #2ecc71;
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
     }
 
-    .btn-start.done-btn:hover { background: #f4fcf4; }
-
-    /* status badge */
-    .module-status {
-        position: absolute;
-        top: 14px; right: 14px;
-        font-family: 'DM Mono', monospace;
-        font-size: 9px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 2px 8px;
-        border-radius: 2px;
+    .btn-primary.completed {
+        background-color: var(--success-color);
+        border: 2px solid var(--success-color);
     }
 
-    .status-done    { background: #eafaea; color: #1a7a1a; }
-    .status-started { background: #fff8e8; color: #8a6a00; }
-    .status-new     { background: #f0f0f0; color: #999; }
+    .btn-primary.completed:hover {
+        background-color: #059669;
+    }
 
-    /* ── Grade result card ── */
-    .grade-result-card {
-        margin-top: 24px;
-        border: 1px solid;
-        border-radius: 2px;
-        padding: 24px 28px;
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .result-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .result-header {
         display: flex;
-        gap: 28px;
-        align-items: flex-start;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .grade-left {
+    .grade-display {
         text-align: center;
-        min-width: 80px;
+        min-width: 5rem;
     }
 
     .grade-letter {
-        font-family: 'DM Mono', monospace;
-        font-size: 56px;
-        font-weight: 500;
+        font-size: 3.5rem;
+        font-weight: 800;
         line-height: 1;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.25rem;
     }
 
     .grade-label {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        font-weight: 600;
         text-transform: uppercase;
-        margin-top: 4px;
+        letter-spacing: 0.05em;
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    .grade-right { flex: 1; }
+    .result-content {
+        flex: 1;
+    }
 
-    .grade-feedback-label {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        letter-spacing: 0.08em;
+    .result-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-500);
         text-transform: uppercase;
-        color: #aaa;
-        margin-bottom: 8px;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    .grade-feedback-text {
-        font-size: 14px;
-        line-height: 1.7;
-        color: #333;
-        margin-bottom: 12px;
+    .result-text {
+        font-size: 1rem;
+        color: var(--gray-700);
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
     }
 
-    .grade-meta {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        color: #bbb;
-        letter-spacing: 0.04em;
+    .result-meta {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    /* ── Final Submit Banner ── */
-    .final-banner {
-        margin-top: 24px;
-        background: #1a1a1a;
-        border-radius: 2px;
-        padding: 20px 24px;
+    .submit-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+        color: white;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-top: 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 20px;
+        box-shadow: var(--shadow-lg);
     }
 
-    .final-banner-text {
-        color: #fff;
-        font-size: 14px;
-        font-weight: 500;
+    .submit-content h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
     }
 
-    .final-banner-sub {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-        color: #888;
-        margin-top: 3px;
+    .submit-content p {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        margin: 0;
     }
 
-    .btn-final-submit {
-        background: #fff;
-        color: #1a1a1a;
-        border: none;
-        padding: 10px 28px;
-        border-radius: 2px;
-        font-size: 13px;
-        font-weight: 500;
+    .btn-submit {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid white;
+        padding: 0.75rem 2rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 600;
         cursor: pointer;
-        font-family: 'DM Sans', sans-serif;
-        white-space: nowrap;
-        text-decoration: none;
-        transition: background 0.12s;
+        transition: all 0.2s ease;
     }
 
-    .btn-final-submit:hover { background: #f0f0f0; }
-    .btn-final-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-submit:hover {
+        background: transparent;
+        color: white;
+    }
 
-    /* ── Submitted state ── */
-    .submitted-banner {
-        margin-top: 24px;
-        background: #f4fcf4;
-        border: 1px solid #c6e6c6;
-        border-radius: 2px;
-        padding: 20px 24px;
+    .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .status-banner {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        color: #92400e;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-top: 2rem;
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 1rem;
     }
 
-    .submitted-banner-icon {
-        font-size: 22px;
+    .status-icon {
+        font-size: 1.5rem;
     }
 
-    .submitted-banner-text {
-        font-size: 14px;
-        font-weight: 500;
-        color: #1a6a1a;
+    .status-content h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
     }
 
-    .submitted-banner-sub {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-        color: #888;
-        margin-top: 3px;
+    .status-content p {
+        font-size: 0.875rem;
+        margin: 0;
     }
 
-    .empty-card {
-        background: #fff;
-        border: 1px solid #e5e5e5;
-        border-radius: 2px;
-        padding: 56px;
+    .empty-state {
         text-align: center;
-        font-family: 'DM Mono', monospace;
-        font-size: 13px;
-        color: #aaa;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-state h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .module-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .result-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .submit-banner {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
     }
 </style>
 
 @if(!$assignment)
-    <div class="empty-card">No topic has been assigned to you yet.<br>Your mentor will assign one soon.</div>
+    <div class="empty-state">
+        <h2>No Topic Assigned</h2>
+        <p>Your mentor will assign a topic for you to practice soon.</p>
+    </div>
 @else
 
 @php
@@ -309,63 +427,55 @@
     $alreadyFinalSubmitted = in_array($assignment->status, ['submitted', 'evaluated']);
 @endphp
 
-<div class="page-header">
-    <div>
-        <div class="page-title">{{ $topic->title }}</div>
-        <div class="page-meta">{{ $topic->description }}</div>
-    </div>
-    <span class="deadline-pill {{ $isDeadlineOver ? 'overdue' : '' }}">
-        {{ $isDeadlineOver ? 'Overdue · ' : 'Due · ' }}
-        {{ \Carbon\Carbon::parse($assignment->deadline)->format('d M Y') }}
-    </span>
-</div>
-
-{{-- Module cards --}}
-<div class="module-grid">
-    @foreach($grouped as $type => $questions)
-        @php
-            $counts   = $submissionCounts[$type] ?? ['total' => count($questions), 'submitted' => 0];
-            $total    = $counts['total'];
-            $done     = $counts['submitted'];
-            $pct      = $total > 0 ? round(($done / $total) * 100) : 0;
-            $isDone   = $done >= $total && $total > 0;
-            $hasStarted = $done > 0 && !$isDone;
-        @endphp
-        <div class="module-card {{ $isDone ? 'done' : '' }}">
-
-            {{-- Status badge --}}
-            @if($isDone)
-                <span class="module-status status-done">Complete</span>
-            @elseif($hasStarted)
-                <span class="module-status status-started">In Progress</span>
-            @else
-                <span class="module-status status-new">Not Started</span>
-            @endif
-
-            <div class="module-type">{{ str_replace('_', ' ', $type) }}</div>
-            <div class="module-count">{{ $total }}</div>
-            <div class="module-count-label">Questions</div>
-
-            <div class="module-progress">
-                <div class="module-progress-fill {{ $isDone ? 'full' : '' }}"
-                     style="width: {{ $pct }}%"></div>
-            </div>
-            <div class="module-progress-label">{{ $done }}/{{ $total }} answered</div>
-
-            {{-- If already final-submitted, disable navigation --}}
-            @if($alreadyFinalSubmitted)
-                <span class="btn-start done-btn" style="cursor:default;">
-                    ✓ Submitted
-                </span>
-            @else
-                <a href="{{ route('intern.exam', [$assignment->id, $type]) }}"
-                   class="btn-start {{ $isDone ? 'done-btn' : '' }}">
-                    {{ $isDone ? '✓ Review' : ($hasStarted ? 'Continue →' : 'Start Test →') }}
-                </a>
-            @endif
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">{{ $topic->title }}</h1>
+            <p class="page-meta">{{ $topic->description }}</p>
         </div>
-    @endforeach
-</div>
+        <span class="deadline-badge {{ $isDeadlineOver ? 'overdue' : '' }}">
+            {{ $isDeadlineOver ? 'Overdue' : 'Due' }}: {{ \Carbon\Carbon::parse($assignment->deadline)->format('M j, Y') }}
+        </span>
+    </div>
+
+    <div class="module-grid">
+        @foreach($grouped as $type => $questions)
+            @php
+                $counts = $submissionCounts[$type] ?? ['total' => count($questions), 'submitted' => 0];
+                $total = $counts['total'];
+                $done = $counts['submitted'];
+                $pct = $total > 0 ? round(($done / $total) * 100) : 0;
+                $isDone = $done >= $total && $total > 0;
+                $hasStarted = $done > 0 && !$isDone;
+            @endphp
+            <div class="module-card {{ $isDone ? 'completed' : '' }}">
+                <span class="module-status {{ $isDone ? 'status-completed' : ($hasStarted ? 'status-in-progress' : 'status-not-started') }}">
+                    {{ $isDone ? 'Completed' : ($hasStarted ? 'In Progress' : 'Not Started') }}
+                </span>
+
+                <div class="module-type">{{ ucwords(str_replace('_', ' ', $type)) }}</div>
+                <div class="module-count">{{ $total }}</div>
+                <div class="module-label">Questions</div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill {{ $isDone ? 'completed' : '' }}" style="width: {{ $pct }}%"></div>
+                    </div>
+                    <div class="progress-text">{{ $done }}/{{ $total }} answered</div>
+                </div>
+
+                @if($alreadyFinalSubmitted)
+                    <button class="btn-primary completed" disabled>
+                        ✓ Submitted
+                    </button>
+                @else
+                    <a href="{{ route('intern.exam', [$assignment->id, $type]) }}" class="btn-primary {{ $isDone ? 'completed' : '' }}">
+                        {{ $isDone ? '✓ Review' : ($hasStarted ? 'Continue' : 'Start') }}
+                    </a>
+                @endif
+            </div>
+        @endforeach
+    </div>
 
 {{-- Grade result card (shown after AI evaluation) --}}
 @if($alreadyFinalSubmitted && $assignment->grade)

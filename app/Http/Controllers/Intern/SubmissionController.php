@@ -42,10 +42,12 @@ class SubmissionController extends Controller
         }
 
         // Mark assignment as submitted first (locks further changes)
-        $assignment->update([
-            'status'       => 'submitted',
-            'submitted_at' => now(),
-        ]);
+        \DB::transaction(function () use ($assignment) {
+            $assignment->update([
+                'status'       => 'submitted',
+                'submitted_at' => now(),
+            ]);
+        });
 
         // ── Send ALL answers to Groq in one prompt ──────────────
         try {
@@ -83,9 +85,9 @@ class SubmissionController extends Controller
         $submissions = Submission::where('intern_id', $internId)
             ->with('question')
             ->latest()
-            ->get();
+            ->paginate(20);
 
-        $totalSubmissions = $submissions->count();
+        $totalSubmissions = $submissions->total();
         $reviewedCount    = $submissions->where('status', 'reviewed')->count();
 
         return view('intern.submissions', compact(
