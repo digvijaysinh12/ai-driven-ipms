@@ -4,19 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'AI Internship System') }}</title>
-
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    <title>@yield('title', 'Dashboard') | AI Internship Platform</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
+<body>
 
-<body class="font-sans antialiased bg-gray-100">
+<div class="layout">
+    {{-- Single sidebar component — switches content by role automatically --}}
+    @include('components.sidebar')
 
-    @yield('body')
+    <div class="main-col">
+        <header class="topbar">
+            <span class="topbar-title">@yield('title', 'Dashboard')</span>
+            <span class="topbar-meta">{{ ucfirst(auth()->user()->role->name ?? '') }} Panel</span>
+        </header>
 
-    @include('components.toast')
+        <main class="page-content">
+            <x-ui.flash />
+            @yield('content')
+        </main>
+    </div>
+</div>
 
-    @stack('scripts')
-
+@include('components.toast')
+@stack('scripts')
 </body>
 </html>
