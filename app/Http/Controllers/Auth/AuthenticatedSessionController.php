@@ -11,52 +11,48 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
-public function store(LoginRequest $request): RedirectResponse
-{
-    $request->authenticate();
-    $request->session()->regenerate();
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
 
-    $user = auth()->user();
+        $user = auth()->user();
 
-    if (!$user->hasVerifiedEmail()) {
-        return redirect()->route('verification.notice');
+        // Check email verification
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
+        // HR bypasses status check (seeded as approved)
+        if ($user->role->name !== 'hr' && $user->status !== 'approved') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $message = $user->status === 'rejected'
+                ? 'Your account has been rejected. Please contact HR.'
+                : 'Your account is pending HR approval. Please wait.';
+
+            return redirect()->route('login')->with('error', $message);
+        }
+
+        return match ($user->role->name) {
+            'hr'     => redirect()->route('hr.dashboard'),
+            'mentor' => redirect()->route('mentor.dashboard'),
+            'intern' => redirect()->route('intern.dashboard'),
+            default  => redirect()->route('dashboard'),
+        };
     }
 
-    switch ($user->role->name) {
-        case 'hr':
-            return redirect()->route('hr.dashboard');
-
-        case 'mentor':
-            return redirect()->route('mentor.dashboard');
-
-        case 'intern':
-            return redirect()->route('intern.dashboard');
-
-        default:
-            return redirect()->route('dashboard');
-    }
-}
-
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
