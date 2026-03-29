@@ -10,14 +10,15 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
+        // Register route middleware aliases
         $middleware->alias([
-            'checkrole' => \App\Http\Middleware\CheckRole::class,
-            'approved' => \App\Http\Middleware\CheckApproved::class,
-            'assigned' => \App\Http\Middleware\CheckAssigned::class,
-            'ensureNotAssigned' => \App\Http\Middleware\EnsureNotAssigned::class
+            'checkrole'  => \App\Http\Middleware\CheckRole::class,
+            'approved'   => \App\Http\Middleware\CheckApproved::class,
+            'assigned'   => \App\Http\Middleware\CheckAssigned::class,
+            'notassigned'=> \App\Http\Middleware\EnsureNotAssigned::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
