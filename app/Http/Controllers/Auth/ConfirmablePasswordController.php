@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\User;
 
 class ConfirmablePasswordController extends Controller
 {
@@ -35,6 +36,16 @@ class ConfirmablePasswordController extends Controller
 
         $request->session()->put('auth.password_confirmed_at', time());
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended($this->homeRouteFor($request->user()));
+    }
+
+    private function homeRouteFor(User $user): string
+    {
+        return match ($user->role->name ?? null) {
+            'hr' => route('hr.dashboard', absolute: false),
+            'mentor' => route('mentor.dashboard', absolute: false),
+            'intern' => route('intern.dashboard', absolute: false),
+            default => url('/'),
+        };
     }
 }
