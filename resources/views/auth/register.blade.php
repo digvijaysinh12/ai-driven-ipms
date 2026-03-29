@@ -1,144 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register | AI Internship System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css'])
-</head>
+@extends('layouts.guest')
+@section('title', 'Create Account')
 
-<body class="bg-gray-100">
+@section('content')
+<div class="auth-wrapper">
+    <div class="auth-brand">
+        <div>
+            <div class="brand-label">AI Internship Platform</div>
+            <div class="brand-name">Manage.<br>Assess.<br>Grow.</div>
+        </div>
+        <div class="brand-tagline">Structured learning management<br>for teams and their interns.</div>
+    </div>
 
-<div class="min-h-screen flex items-center justify-center px-6">
-    <div class="w-full max-w-md bg-white border shadow-md rounded-lg p-8">
+    <div class="auth-panel">
+        <div class="auth-title">Create Account</div>
 
-        <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">
-            Create Account
-        </h2>
-
-        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        <form method="POST" action="{{ route('register') }}">
             @csrf
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" value="{{ old('name') }}"
+                       class="form-input" placeholder="Jane Smith" required>
+                @error('name') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
 
-            <input type="text" name="name"
-                   value="{{ old('name') }}"
-                   placeholder="Full Name"
-                   class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   required>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" value="{{ old('email') }}"
+                       class="form-input" placeholder="you@company.com" required>
+                @error('email') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
 
-            <input type="email" name="email"
-                   value="{{ old('email') }}"
-                   placeholder="Email Address"
-                   class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   required>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                @error('password') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
 
-            <input type="password" name="password"
-                   placeholder="Password"
-                   class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   required>
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="password_confirmation" class="form-input" placeholder="••••••••" required>
+            </div>
 
-            <input type="password" name="password_confirmation"
-                   placeholder="Confirm Password"
-                   class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   required>
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <div style="position:relative;">
+                    <select name="role" id="role" class="form-select" required>
+                        <option value="">Select role</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                                {{ $role->name === 'mentor' ? 'Team Lead' : ucfirst($role->name) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('role') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
 
-            <select name="role" id="role"
-                    class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                    required>
-                <option value="">Select Role</option>
-                @foreach ($roles as $role)
-                    <option value="{{ $role->name }}"
-                        {{ old('role') == $role->name ? 'selected' : '' }}>
-                        {{ $role->name === 'mentor' ? 'Team Lead' : ucfirst($role->name) }}
-                    </option>
-                @endforeach
-            </select>
-
-            <div id="technology-wrapper" style="display:none;">
-                <select name="technology_id"
-                        class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Select Technology</option>
+            <div class="form-group" id="technology-wrapper" style="display:none;">
+                <label class="form-label">Technology</label>
+                <select name="technology_id" class="form-select">
+                    <option value="">Select technology</option>
                     @foreach ($technologies as $t)
-                        <option value="{{ $t->id }}"
-                            {{ old('technology_id') == $t->id ? 'selected' : '' }}>
+                        <option value="{{ $t->id }}" {{ old('technology_id') == $t->id ? 'selected' : '' }}>
                             {{ $t->name }}
                         </option>
                     @endforeach
                 </select>
+                @error('technology_id') <div class="form-error">{{ $message }}</div> @enderror
             </div>
 
-            <button type="submit"
-                    class="w-full bg-indigo-600 text-white py-2 rounded-md font-medium hover:bg-indigo-700">
-                Register
-            </button>
+            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Create Account</button>
 
-            <p class="text-sm text-center text-gray-600">
-                Already registered?
-                <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">
-                    Sign in
-                </a>
-            </p>
-
+            <div class="divider"></div>
+            <div class="auth-footer">
+                Already registered? <a href="{{ route('login') }}" class="link">Sign in</a>
+            </div>
         </form>
-
     </div>
 </div>
 
-<!-- SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true
-});
-
-// Show Technology dropdown only for intern
-document.addEventListener('DOMContentLoaded', function(){
-    const roleSelect = document.getElementById('role');
+document.addEventListener('DOMContentLoaded', function () {
+    const roleSelect  = document.getElementById('role');
     const techWrapper = document.getElementById('technology-wrapper');
-
-    function toggleTechnology(){
-        if(roleSelect.value === 'intern'){
-            techWrapper.style.display = 'block';
-        }else{
-            techWrapper.style.display = 'none';
-        }
+    function toggle() {
+        techWrapper.style.display = roleSelect.value === 'intern' ? 'block' : 'none';
     }
-
-    toggleTechnology();
-    roleSelect.addEventListener('change', toggleTechnology);
+    toggle();
+    roleSelect.addEventListener('change', toggle);
 });
 </script>
-
-@if(session('success'))
-<script>
-    Toast.fire({
-        icon: 'success',
-        title: "{{ session('success') }}"
-    });
-</script>
-@endif
-
-@if(session('error'))
-<script>
-    Toast.fire({
-        icon: 'error',
-        title: "{{ session('error') }}"
-    });
-</script>
-@endif
-
-@if($errors->any())
-<script>
-    Toast.fire({
-        icon: 'error',
-        title: "{{ $errors->first() }}"
-    });
-</script>
-@endif
-
-</body>
-</html>
+@endsection
