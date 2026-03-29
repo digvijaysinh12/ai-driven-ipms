@@ -1,19 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\ProfileController;
 
+<<<<<<< HEAD
 // HR
 use App\Http\Controllers\HR\DashboardController as HRDashboardController;
 use App\Http\Controllers\HR\MentorAssignmentController;
 
 // Intern
+=======
+// ── HR ───────────────────────────────────────────────────────────────────────
+use App\Http\Controllers\HR\DashboardController as HRDashboardController;
+use App\Http\Controllers\HR\MentorAssignmentController;
+
+// ── Intern ───────────────────────────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 use App\Http\Controllers\Intern\WaitingController;
 use App\Http\Controllers\Intern\DashboardController as InternDashboardController;
 use App\Http\Controllers\Intern\TopicController as InternTopicController;
 use App\Http\Controllers\Intern\SubmissionController;
 
+<<<<<<< HEAD
 // Mentor
+=======
+// ── Mentor ───────────────────────────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 use App\Http\Controllers\Mentor\TopicController;
 use App\Http\Controllers\Mentor\InternController;
@@ -36,6 +49,10 @@ Route::get('/', fn () => view('welcome'));
 |--------------------------------------------------------------------------
 */
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 // Waiting: approved but no mentor yet
 Route::get('/intern/waiting', [WaitingController::class, 'index'])
     ->middleware(['auth', 'verified', 'approved'])
@@ -47,9 +64,11 @@ Route::prefix('intern')
     ->name('intern.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [InternDashboardController::class, 'index'])
             ->name('dashboard');
 
+<<<<<<< HEAD
         Route::get('/topic', [InternTopicController::class, 'index'])
             ->name('topic');
 
@@ -62,6 +81,22 @@ Route::prefix('intern')
             ->name('exam.save');
 
         // Final submit — evaluates all answers via AI
+=======
+        // Topic overview (module cards)
+        Route::get('/topic', [InternTopicController::class, 'index'])
+            ->name('topic');
+
+        // ── Exam mode ─────────────────────────────────────────────────
+        // Open a module as an exam (one question at a time)
+        Route::get('/exam/{assignmentId}/{type}', [InternTopicController::class, 'exam'])
+            ->name('exam');
+
+        // AJAX: save a single answer during exam (no evaluation)
+        Route::post('/exam/save', [InternTopicController::class, 'saveAnswer'])
+            ->name('exam.save');
+
+        // FINAL SUBMIT: evaluates all answers via AI, locks module
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::post('/final-submit/{assignmentId}', [SubmissionController::class, 'finalSubmit'])
             ->name('final.submit');
 
@@ -70,6 +105,7 @@ Route::prefix('intern')
             ->middleware('throttle:code-executions')
             ->name('run.code');
 
+<<<<<<< HEAD
         // Submissions list
         Route::get('/submissions', [SubmissionController::class, 'index'])
             ->name('submissions');
@@ -78,6 +114,17 @@ Route::prefix('intern')
             ->name('attendance');
 
         Route::get('/performance', [InternDashboardController::class, 'performance'])
+=======
+        // Submissions list (scores hidden until mentor reviews)
+        Route::get('/submissions', [SubmissionController::class, 'index'])
+            ->name('submissions');
+
+        // Placeholder routes to satisfy sidebar links (implement later)
+        Route::get('/attendance', fn () => 'Attendance page coming soon')
+            ->name('attendance');
+
+        Route::get('/performance', fn () => 'Performance page coming soon')
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
             ->name('performance');
     });
 
@@ -93,26 +140,49 @@ Route::middleware(['auth', 'verified', 'approved', 'checkrole:mentor'])
     ->name('mentor.')
     ->group(function () {
 
+<<<<<<< HEAD
         Route::get('/dashboard', [MentorDashboardController::class, 'index'])
             ->name('dashboard');
 
+=======
+        // Dashboard
+        Route::get('/dashboard', [MentorDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Interns list + progress
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::get('/interns', [InternController::class, 'index'])
             ->name('interns');
 
         Route::get('/interns/{internId}/progress', [InternController::class, 'progress'])
             ->name('interns.progress');
 
+<<<<<<< HEAD
         Route::get('/assignments', [TopicAssignController::class, 'index'])
             ->name('assignments');
 
         // IMPORTANT: These come BEFORE Route::resource('topics') to avoid pattern conflicts
+=======
+        // All assignments made by this mentor
+        Route::get('/assignments', [TopicAssignController::class, 'index'])
+            ->name('assignments');
+
+        // ── Assign topic to intern ──────────────────────────────
+        // IMPORTANT: These two routes must come BEFORE Route::resource('topics')
+        // to avoid being swallowed by topics/{topic} pattern
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::get('/assign', [TopicAssignController::class, 'create'])
             ->name('topics.assign');
 
         Route::post('/assign', [TopicAssignController::class, 'store'])
             ->name('topics.assign.store');
 
+<<<<<<< HEAD
         // Topic CRUD
+=======
+        // ── Topic CRUD ──────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::resource('topics', TopicController::class);
 
         // AI question generation
@@ -128,7 +198,11 @@ Route::middleware(['auth', 'verified', 'approved', 'checkrole:mentor'])
         Route::get('topics/{topic}/questions/{type}', [TopicController::class, 'showQuestions'])
             ->name('topics.questions');
 
+<<<<<<< HEAD
         // Submission review
+=======
+        // ── Submission review ───────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::get('/submissions', [SubmissionReviewController::class, 'index'])
             ->name('submissions.index');
 
@@ -169,6 +243,12 @@ Route::middleware(['auth', 'verified', 'checkrole:hr'])
         Route::get('/mentor-assignments', [MentorAssignmentController::class, 'index'])
             ->name('mentor.assignments');
 
+<<<<<<< HEAD
+=======
+        Route::get('/intern-mentor', [MentorAssignmentController::class, 'index'])
+            ->name('intern.mentor');
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Route::get('/intern-mentor-list', [MentorAssignmentController::class, 'list'])
             ->name('intern.mentor.list');
 

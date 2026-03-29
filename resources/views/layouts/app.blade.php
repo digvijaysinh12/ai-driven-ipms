@@ -21,7 +21,11 @@
         </header>
 
         <main class="page-content">
+<<<<<<< HEAD
             <x-ui.flash />
+=======
+            @include('components.alert')
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
             @yield('content')
         </main>
     </div>

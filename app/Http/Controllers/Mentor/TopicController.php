@@ -16,9 +16,15 @@ use App\Http\Requests\StoreTopicRequest;
 
 class TopicController extends Controller
 {
+<<<<<<< HEAD
     /**
      * List all topics for this mentor.
      */
+=======
+    // ─────────────────────────────────────────────
+    // List all topics for this mentor
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function index()
     {
         $topics = Topic::where('mentor_id', Auth::id())
@@ -29,19 +35,34 @@ class TopicController extends Controller
         return view('mentor.topics.index', compact('topics'));
     }
 
+<<<<<<< HEAD
     /**
      * Show create form.
      */
+=======
+    // ─────────────────────────────────────────────
+    // Show create form
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function create()
     {
         return view('mentor.topics.create');
     }
 
+<<<<<<< HEAD
     /**
      * Store new topic.
      */
     public function store(StoreTopicRequest $request)
     {
+=======
+    // ─────────────────────────────────────────────
+    // Store new topic
+    // ─────────────────────────────────────────────
+    public function store(StoreTopicRequest $request)
+    {
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         Topic::create([
             'mentor_id'        => Auth::id(),
             'title'            => $request->title,
@@ -59,13 +80,23 @@ class TopicController extends Controller
             ->with('success', 'Topic created successfully.');
     }
 
+<<<<<<< HEAD
     /**
      * Show topic detail — question type cards.
      */
+=======
+    // ─────────────────────────────────────────────
+    // Show topic detail — question type cards
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function show(Topic $topic)
     {
         $this->authorize('view', $topic);
 
+<<<<<<< HEAD
+=======
+        // Count per type for the mosaic cards
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         $typeCounts = $topic->questions()
             ->selectRaw('type, count(*) as total')
             ->groupBy('type')
@@ -74,9 +105,15 @@ class TopicController extends Controller
         return view('mentor.topics.show', compact('topic', 'typeCounts'));
     }
 
+<<<<<<< HEAD
     /**
      * Show questions list for a specific type.
      */
+=======
+    // ─────────────────────────────────────────────
+    // Show questions list for a specific type
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function showQuestions(Topic $topic, string $type)
     {
         $this->authorize('view', $topic);
@@ -92,13 +129,23 @@ class TopicController extends Controller
         return view('mentor.topics.questions', compact('topic', 'questions', 'type'));
     }
 
+<<<<<<< HEAD
     /**
      * Trigger AI question generation via Groq.
      */
+=======
+    // ─────────────────────────────────────────────
+    // Trigger AI question generation via Groq
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function generateAI(Topic $topic, GroqQuestionService $aiService)
     {
         $this->authorize('update', $topic);
 
+<<<<<<< HEAD
+=======
+        // Only allow generation on draft or re-generation on ai_generated
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         if ($topic->status === 'published') {
             return back()->with('error', 'Cannot regenerate questions for a published topic.');
         }
@@ -116,10 +163,18 @@ class TopicController extends Controller
             'coding'     => $topic->coding_count,
         ];
 
+<<<<<<< HEAD
         foreach ($modules as $type => $count) {
             if ($count <= 0) {
                 continue;
             }
+=======
+        $errors = [];
+
+        foreach ($modules as $type => $count) {
+            if ($count <= 0) continue;
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
             GenerateQuestionsJob::dispatch($topic, $type, $count);
         }
 
@@ -128,9 +183,15 @@ class TopicController extends Controller
         return back()->with('success', 'AI question generation started. Check back shortly for results.');
     }
 
+<<<<<<< HEAD
     /**
      * Publish a topic (makes it assignable to interns).
      */
+=======
+    // ─────────────────────────────────────────────
+    // Publish a topic (makes it assignable to interns)
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function publish(Topic $topic)
     {
         $this->authorize('publish', $topic);
@@ -143,12 +204,21 @@ class TopicController extends Controller
 
         event(new TopicPublished($topic));
 
+<<<<<<< HEAD
         return back()->with('success', 'Topic published. It can now be assigned to interns.');
     }
 
     /**
      * Delete a topic (only draft or ai_generated).
      */
+=======
+        return back()->with('success', 'Topic published successfully. It can now be assigned to interns.');
+    }
+
+    // ─────────────────────────────────────────────
+    // Delete a topic (only draft/ai_generated)
+    // ─────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function destroy(Topic $topic)
     {
         $this->authorize('delete', $topic);
@@ -163,6 +233,7 @@ class TopicController extends Controller
             ->route('mentor.topics.index')
             ->with('success', 'Topic deleted.');
     }
+<<<<<<< HEAD
 
     /**
      * Edit form (required for resource route).
@@ -194,4 +265,6 @@ class TopicController extends Controller
             ->route('mentor.topics.show', $topic)
             ->with('success', 'Topic updated.');
     }
+=======
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 }

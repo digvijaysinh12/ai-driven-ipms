@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 @extends('layouts.app')
+=======
+@extends('layouts.intern')
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 
 @section('title', 'Waiting for Assignment')
 
@@ -94,4 +98,8 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 @endsection
+=======
+@endsection
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26

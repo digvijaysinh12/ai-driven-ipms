@@ -11,9 +11,16 @@ use App\Models\Topic;
 
 class SubmissionReviewController extends Controller
 {
+<<<<<<< HEAD
     /**
      * Index — load all submissions for accordion display.
      */
+=======
+    // ─────────────────────────────────────────────────────────────
+    // Index — loads EVERYTHING for the accordion
+    // No separate show page needed
+    // ─────────────────────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function index()
     {
         $mentorId    = Auth::id();
@@ -40,18 +47,30 @@ class SubmissionReviewController extends Controller
         ));
     }
 
+<<<<<<< HEAD
     /**
      * Show — redirect to index (accordion opens via session flash).
      */
+=======
+    // ─────────────────────────────────────────────────────────────
+    // Show — kept for direct URL access, redirects to index
+    // ─────────────────────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function show(int $submissionId)
     {
         return redirect()->route('mentor.submissions.index')
             ->with('open_submission', $submissionId);
     }
 
+<<<<<<< HEAD
     /**
      * Review — AJAX + regular POST both supported.
      */
+=======
+    // ─────────────────────────────────────────────────────────────
+    // Review — AJAX + regular POST both supported
+    // ─────────────────────────────────────────────────────────────
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     public function review(Request $request, int $submissionId)
     {
         $request->validate([
@@ -86,6 +105,10 @@ class SubmissionReviewController extends Controller
             ->where('id', $submission->question_id)
             ->exists();
 
+<<<<<<< HEAD
         abort_unless($allowed, 403, 'Unauthorized: this submission does not belong to your topics.');
+=======
+        abort_unless($allowed, 403, 'Unauthorized.');
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     }
 }

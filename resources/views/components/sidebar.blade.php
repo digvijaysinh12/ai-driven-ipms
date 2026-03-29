@@ -7,6 +7,10 @@
     </div>
 
     <nav class="sidebar-nav">
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         @if($role === 'hr')
             <div class="nav-section-label">Overview</div>
             <a href="{{ route('hr.dashboard') }}"
@@ -25,12 +29,20 @@
             </a>
             <a href="{{ route('hr.intern.mentor.list') }}"
                class="nav-link {{ request()->routeIs('hr.intern.mentor.list') ? 'active' : '' }}">
+<<<<<<< HEAD
                 <span class="nav-dot"></span> Intern-Mentor Map
+=======
+                <span class="nav-dot"></span> Intern–Mentor Map
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
             </a>
             <a href="{{ route('hr.intern.progress') }}"
                class="nav-link {{ request()->routeIs('hr.intern.progress*') ? 'active' : '' }}">
                 <span class="nav-dot"></span> Intern Progress
             </a>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         @elseif($role === 'mentor')
             <div class="nav-section-label">Overview</div>
             <a href="{{ route('mentor.dashboard') }}"
@@ -61,6 +73,10 @@
                class="nav-link {{ request()->routeIs('mentor.submissions.*') ? 'active' : '' }}">
                 <span class="nav-dot"></span> Submissions
             </a>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         @elseif($role === 'intern')
             <div class="nav-section-label">Overview</div>
             <a href="{{ route('intern.dashboard') }}"
@@ -70,11 +86,19 @@
 
             <div class="nav-section-label">Work</div>
             <a href="{{ route('intern.topic') }}"
+<<<<<<< HEAD
                class="nav-link {{ request()->routeIs('intern.topic', 'intern.exam') ? 'active' : '' }}">
                 <span class="nav-dot"></span> My Topic
             </a>
             <a href="{{ route('intern.submissions') }}"
                class="nav-link {{ request()->routeIs('intern.submissions*') ? 'active' : '' }}">
+=======
+               class="nav-link {{ request()->routeIs('intern.topic*') ? 'active' : '' }}">
+                <span class="nav-dot"></span> My Topic
+            </a>
+            <a href="{{ route('intern.submissions') }}"
+               class="nav-link {{ request()->routeIs('intern.submissions') ? 'active' : '' }}">
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
                 <span class="nav-dot"></span> Submissions
             </a>
             <a href="{{ route('intern.attendance') }}"
@@ -86,6 +110,10 @@
                 <span class="nav-dot"></span> Performance
             </a>
         @endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     </nav>
 
     <div class="sidebar-footer">
@@ -97,4 +125,8 @@
             <button class="logout-btn">Sign out</button>
         </form>
     </div>
+<<<<<<< HEAD
 </aside>
+=======
+</aside>
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26

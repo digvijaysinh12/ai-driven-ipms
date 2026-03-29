@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Topic extends Model
 {
+<<<<<<< HEAD
     use SoftDeletes;
 
     protected $fillable = [
@@ -65,4 +66,30 @@ class Topic extends Model
              + $this->output_count
              + $this->coding_count;
     }
+=======
+use SoftDeletes;
+
+protected $fillable = [
+'mentor_id',
+'title',
+'description',
+'status',
+'mcq_count',
+'blank_count',
+'true_false_count',
+'output_count',
+'coding_count'
+];
+
+public function mentor()
+{
+return $this->belongsTo(User::class,'mentor_id');
+}
+
+public function questions()
+{
+return $this->hasMany(Question::class);
+}
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 }

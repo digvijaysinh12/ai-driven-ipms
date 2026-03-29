@@ -36,6 +36,7 @@ class DashboardController extends Controller
 
         // Total questions in the current topic
         $questionCount = 0;
+<<<<<<< HEAD
         $submittedCount = 0;
 
         if ($currentAssignment?->topic) {
@@ -47,6 +48,15 @@ class DashboardController extends Controller
                 ->count();
         }
 
+=======
+        if ($currentAssignment?->topic) {
+            $questionCount = $currentAssignment->topic->questions()->count();
+        }
+
+        // How many questions this intern has submitted answers for
+        $submittedCount = Submission::where('intern_id', $intern->id)->count();
+
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         // Remaining questions in current topic
         $pendingCount = max(0, $questionCount - $submittedCount);
 
@@ -78,6 +88,7 @@ class DashboardController extends Controller
             'reviewedCount',
             'avgScore'
         ));
+<<<<<<< HEAD
     }
 
     public function attendance()
@@ -152,5 +163,7 @@ class DashboardController extends Controller
     private function roundAverage($value): ?float
     {
         return $value === null ? null : round((float) $value, 1);
+=======
+>>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     }
 }
