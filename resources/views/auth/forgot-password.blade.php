@@ -1,46 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reset Password | AI Internship System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css'])
-</head>
-<body class="bg-gray-100">
+@extends('layouts.guest')
+@section('title', 'Reset Password')
 
-<div class="min-h-screen flex items-center justify-center px-6">
-    <div class="w-full max-w-md bg-white border shadow-md rounded-lg p-8">
+@section('content')
+<div class="auth-body" style="justify-content:center;">
+    <div style="width:100%;max-width:420px;background:#fff;border:1px solid #e2e2e2;border-radius:2px;padding:48px 44px;">
+        <a href="{{ route('login') }}" class="back-link" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:32px;">← Back to Sign In</a>
 
-        <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">
-            Reset Password
-        </h2>
+        <div class="auth-title" style="margin-bottom:8px;">Reset Password</div>
+        <p style="font-size:13px;color:#666;margin-bottom:28px;line-height:1.6;">Enter your email and we'll send you a reset link.</p>
 
-        @if (session('status'))
-            <div class="mb-4 text-sm text-green-600 bg-green-50 border border-green-200 p-2 rounded">
-                {{ session('status') }}
-            </div>
+        @if(session('status'))
+            <div class="flash flash-success">{{ session('status') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
+        <form method="POST" action="{{ route('password.email') }}">
             @csrf
-
-            <input type="email" name="email"
-                   value="{{ old('email') }}"
-                   placeholder="Enter your registered email"
-                   class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   required>
-
-            @error('email') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
-
-            <button type="submit"
-                    class="w-full bg-indigo-600 text-white py-2 rounded-md font-medium hover:bg-indigo-700">
-                Send Reset Link
-            </button>
-
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" value="{{ old('email') }}"
+                       class="form-input" placeholder="you@company.com" required>
+                @error('email') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Send Reset Link</button>
         </form>
-
     </div>
 </div>
-
-</body>
-</html>
+@endsection
