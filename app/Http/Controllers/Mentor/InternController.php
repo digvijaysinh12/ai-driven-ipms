@@ -3,20 +3,16 @@
 namespace App\Http\Controllers\Mentor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
+use App\Models\TaskSubmission;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\InternTopicAssignment;
-use App\Models\Submission;
-use App\Models\Question;
-use App\Models\Topic;
-use App\Models\User;
+use Illuminate\View\View;
 
 class InternController extends Controller
 {
-    // ─────────────────────────────────────────────
-    // List all interns assigned to this mentor
-    // ─────────────────────────────────────────────
-    public function index()
+    public function index(): View
     {
         $mentorId = Auth::id();
 
@@ -24,26 +20,31 @@ class InternController extends Controller
             ->join('users', 'mentor_assignments.intern_id', '=', 'users.id')
             ->where('mentor_assignments.mentor_id', $mentorId)
             ->where('mentor_assignments.is_active', 1)
-            ->select(
-                'users.id',
-                'users.name',
-                'users.email',
-                'mentor_assignments.assigned_at'
-            )
+            ->select('users.id', 'users.name', 'users.email', 'mentor_assignments.assigned_at')
             ->get();
 
-        return view('mentor.interns', compact('interns'));
+        $taskIds = Task::query()->where('created_by', $mentorId)->pluck('id');
+
+        foreach ($interns as $intern) {
+            $submissions = TaskSubmission::query()
+                ->where('user_id', $intern->id)
+                ->whereIn('task_id', $taskIds)
+                ->with('status')
+                ->get();
+
+            $intern->total_submissions = $submissions->count();
+            $intern->pending_reviews = $submissions->filter(fn($sub) => 
+                in_array($sub->status?->slug, ['submitted', 'ai_evaluated'])
+            )->count();
+        }
+
+        return view('mentor.interns.index', compact('interns'));
     }
 
-    // ─────────────────────────────────────────────
-    // View a specific intern's full progress
-    // Shows: assignment status, submissions, scores
-    // ─────────────────────────────────────────────
-    public function progress(int $internId)
+    public function progress(int $internId): View
     {
         $mentorId = Auth::id();
 
-        // Confirm this intern belongs to this mentor
         $assigned = DB::table('mentor_assignments')
             ->where('mentor_id', $mentorId)
             ->where('intern_id', $internId)
@@ -54,37 +55,34 @@ class InternController extends Controller
 
         $intern = User::findOrFail($internId);
 
-        // Topic assignments for this intern (only topics owned by this mentor)
-        $topicIds = Topic::where('mentor_id', $mentorId)->pluck('id');
-
-        $assignments = InternTopicAssignment::where('intern_id', $internId)
-            ->whereIn('topic_id', $topicIds)
-            ->with('topic')
+        $tasks = Task::query()
+            ->where('created_by', $mentorId)
+            ->whereHas('users', fn ($query) => $query->where('users.id', $internId))
+            ->withCount('questions')
+            ->with(['type:id,name,slug'])
+            ->with('submissions')
             ->get();
 
-        // All submissions by this intern for this mentor's questions
-        $questionIds = Question::whereIn('topic_id', $topicIds)->pluck('id');
+        $taskIds = Task::query()->where('created_by', $mentorId)->pluck('id');
 
-        $submissions = Submission::where('intern_id', $internId)
-            ->whereIn('question_id', $questionIds)
-            ->with('question')
-            ->latest()
+        $submissions = TaskSubmission::query()
+            ->where('user_id', $internId)
+            ->whereIn('task_id', $taskIds)
+            ->with(['task', 'reviewer', 'status'])
+            ->latest('submitted_at')
             ->get();
 
-        // Score summary
-        $totalSubmissions  = $submissions->count();
-        $evaluatedCount    = $submissions->whereIn('status', ['ai_evaluated', 'reviewed'])->count();
-        $avgScore          = $evaluatedCount > 0
-            ? round($submissions->whereIn('status', ['ai_evaluated', 'reviewed'])->avg('final_score'), 1)
-            : null;
+        $totalSubmissions = $submissions->count();
+        $reviewedCount = $submissions->filter(fn($sub) => 
+            $sub->status?->slug === 'completed'
+        )->count();
 
-        return view('mentor.intern_progress', compact(
+        return view('mentor.interns.progress', compact(
             'intern',
-            'assignments',
+            'tasks',
             'submissions',
             'totalSubmissions',
-            'evaluatedCount',
-            'avgScore'
+            'reviewedCount'
         ));
     }
 }

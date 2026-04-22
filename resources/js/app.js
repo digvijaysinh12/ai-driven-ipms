@@ -1,10 +1,43 @@
 import './bootstrap';
 
-// Alpine.js for modal/dropdown if needed
-// import Alpine from 'alpinejs';
-// window.Alpine = Alpine;
-<<<<<<< HEAD
-// Alpine.start();
-=======
-// Alpine.start();
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+const toggleModal = (id, shouldShow) => {
+    const modal = document.getElementById(id);
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden = !shouldShow;
+    modal.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    document.body.classList.toggle('modal-open', shouldShow);
+};
+
+document.addEventListener('click', (event) => {
+    const openTrigger = event.target.closest('[data-modal-open]');
+    const closeTrigger = event.target.closest('[data-modal-close]');
+
+    if (openTrigger) {
+        event.preventDefault();
+        toggleModal(openTrigger.getAttribute('data-modal-open'), true);
+    }
+
+    if (closeTrigger) {
+        event.preventDefault();
+        toggleModal(closeTrigger.getAttribute('data-modal-close'), false);
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') {
+        return;
+    }
+
+    document.querySelectorAll('.ui-modal').forEach((modal) => {
+        if (!modal.hidden) {
+            modal.hidden = true;
+            modal.setAttribute('aria-hidden', 'true');
+        }
+    });
+
+    document.body.classList.remove('modal-open');
+});

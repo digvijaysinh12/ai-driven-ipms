@@ -42,7 +42,7 @@
         <div class="page-title">Assignments</div>
         <div class="page-meta">{{ $assignments->count() }} total</div>
     </div>
-    <a href="{{ route('mentor.topics.assign') }}" class="btn-create">+ New Assignment</a>
+    <a href="{{ route('user.mentor.tasks.create') }}" class="btn-create">+ New Assignment</a>
 </div>
 
 <div class="table-card">

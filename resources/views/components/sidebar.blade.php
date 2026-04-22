@@ -1,132 +1,135 @@
-@php $role = auth()->user()->role->name ?? ''; @endphp
+@php
+    $role = auth()->user()->role->name ?? '';
+    $userName = auth()->user()->name;
+    $userEmail = auth()->user()->email;
+@endphp
 
-<aside class="sidebar">
-    <div class="sidebar-brand">
-        <div class="sidebar-brand-name">AI Internship</div>
-        <div class="sidebar-brand-sub">{{ ucfirst($role) }} Panel</div>
+<aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 z-40">
+    <!-- Brand -->
+    <div class="px-6 py-8 flex items-center gap-3">
+        <div class="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center p-2 shadow-lg shadow-slate-950/20">
+            <i data-lucide="brain-circuit" class="text-white w-6 h-6"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">AI-IPMS</h1>
+            <p class="text-[10px] font-medium text-indigo-600 uppercase tracking-widest mt-1">{{ $role }} panel</p>
+        </div>
     </div>
 
-    <nav class="sidebar-nav">
-<<<<<<< HEAD
-=======
-
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 space-y-8 overflow-y-auto pt-4 custom-scrollbar">
         @if($role === 'hr')
-            <div class="nav-section-label">Overview</div>
-            <a href="{{ route('hr.dashboard') }}"
-               class="nav-link {{ request()->routeIs('hr.dashboard') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Dashboard
-            </a>
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Overview</p>
+                <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('hr.dashboard')" icon="layout-dashboard">
+                    Dashboard
+                </x-nav-link>
+            </div>
 
-            <div class="nav-section-label">Management</div>
-            <a href="{{ route('hr.users') }}"
-               class="nav-link {{ request()->routeIs('hr.users') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Approvals
-            </a>
-            <a href="{{ route('hr.mentor.assignments') }}"
-               class="nav-link {{ request()->routeIs('hr.mentor.assignments') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Assign Mentors
-            </a>
-            <a href="{{ route('hr.intern.mentor.list') }}"
-               class="nav-link {{ request()->routeIs('hr.intern.mentor.list') ? 'active' : '' }}">
-<<<<<<< HEAD
-                <span class="nav-dot"></span> Intern-Mentor Map
-=======
-                <span class="nav-dot"></span> Intern–Mentor Map
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-            </a>
-            <a href="{{ route('hr.intern.progress') }}"
-               class="nav-link {{ request()->routeIs('hr.intern.progress*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Intern Progress
-            </a>
-<<<<<<< HEAD
-=======
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Management</p>
+                <x-nav-link href="{{ route('admin.users') }}" :active="request()->routeIs('hr.users')" icon="user-check">
+                    Approvals
+                </x-nav-link>
+                <x-nav-link href="{{ route('admin.mentor.assignments') }}" :active="request()->routeIs('hr.mentor.assignments')" icon="user-plus">
+                    Assign Mentors
+                </x-nav-link>
+                <x-nav-link href="{{ route('admin.intern.mentor.list') }}" :active="request()->routeIs('hr.intern.mentor.list')" icon="users">
+                    Intern-Mentor Map
+                </x-nav-link>
+                <x-nav-link href="{{ route('admin.intern.progress') }}" :active="request()->routeIs('hr.intern.progress*')" icon="bar-chart-3">
+                    Intern Progress
+                </x-nav-link>
+                <x-nav-link href="{{ route('admin.attendance') }}" :active="request()->routeIs('hr.attendance')" icon="calendar-check">
+                    Attendance
+                </x-nav-link>
+            </div>
 
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         @elseif($role === 'mentor')
-            <div class="nav-section-label">Overview</div>
-            <a href="{{ route('mentor.dashboard') }}"
-               class="nav-link {{ request()->routeIs('mentor.dashboard') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Dashboard
-            </a>
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Overview</p>
+                <x-nav-link href="{{ route('user.mentor.dashboard') }}" :active="request()->routeIs('user.mentor.dashboard')" icon="layout-dashboard">
+                    Dashboard
+                </x-nav-link>
+            </div>
 
-            <div class="nav-section-label">Manage</div>
-            <a href="{{ route('mentor.interns') }}"
-               class="nav-link {{ request()->routeIs('mentor.interns*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> My Interns
-            </a>
-            <a href="{{ route('mentor.topics.index') }}"
-               class="nav-link {{ request()->routeIs('mentor.topics.*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Topics
-            </a>
-            <a href="{{ route('mentor.topics.assign') }}"
-               class="nav-link {{ request()->routeIs('mentor.topics.assign*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Assign Topic
-            </a>
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Management</p>
+                <x-nav-link href="{{ route('user.mentor.interns') }}" :active="request()->routeIs('user.mentor.interns*')" icon="users-2">
+                    My Interns
+                </x-nav-link>
+                <x-nav-link href="{{ route('user.mentor.tasks.index') }}" :active="request()->routeIs('user.mentor.tasks.*')" icon="file-code">
+                    Tasks
+                </x-nav-link>
+                <x-nav-link href="{{ route('user.mentor.tasks.create') }}" :active="request()->routeIs('user.mentor.tasks.create')" icon="plus-circle">
+                    Create Task
+                </x-nav-link>
+            </div>
 
-            <div class="nav-section-label">Review</div>
-            <a href="{{ route('mentor.assignments') }}"
-               class="nav-link {{ request()->routeIs('mentor.assignments') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Assignments
-            </a>
-            <a href="{{ route('mentor.submissions.index') }}"
-               class="nav-link {{ request()->routeIs('mentor.submissions.*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Submissions
-            </a>
-<<<<<<< HEAD
-=======
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Evaluation</p>
+                <x-nav-link href="{{ route('user.mentor.tasks.index') }}" :active="request()->routeIs('user.mentor.tasks.*')" icon="clipboard-list">
+                    Active Tasks
+                </x-nav-link>
+                <x-nav-link href="{{ route('user.mentor.submissions.index') }}" :active="request()->routeIs('user.mentor.submissions.*')" icon="check-square">
+                    Reviews
+                </x-nav-link>
+            </div>
 
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         @elseif($role === 'intern')
-            <div class="nav-section-label">Overview</div>
-            <a href="{{ route('intern.dashboard') }}"
-               class="nav-link {{ request()->routeIs('intern.dashboard') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Dashboard
-            </a>
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Overview</p>
+                <x-nav-link href="{{ route('user.intern.dashboard') }}" :active="request()->routeIs('user.intern.dashboard')" icon="layout-dashboard">
+                    Dashboard
+                </x-nav-link>
+            </div>
 
-            <div class="nav-section-label">Work</div>
-            <a href="{{ route('intern.topic') }}"
-<<<<<<< HEAD
-               class="nav-link {{ request()->routeIs('intern.topic', 'intern.exam') ? 'active' : '' }}">
-                <span class="nav-dot"></span> My Topic
-            </a>
-            <a href="{{ route('intern.submissions') }}"
-               class="nav-link {{ request()->routeIs('intern.submissions*') ? 'active' : '' }}">
-=======
-               class="nav-link {{ request()->routeIs('intern.topic*') ? 'active' : '' }}">
-                <span class="nav-dot"></span> My Topic
-            </a>
-            <a href="{{ route('intern.submissions') }}"
-               class="nav-link {{ request()->routeIs('intern.submissions') ? 'active' : '' }}">
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                <span class="nav-dot"></span> Submissions
-            </a>
-            <a href="{{ route('intern.attendance') }}"
-               class="nav-link {{ request()->routeIs('intern.attendance') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Attendance
-            </a>
-            <a href="{{ route('intern.performance') }}"
-               class="nav-link {{ request()->routeIs('intern.performance') ? 'active' : '' }}">
-                <span class="nav-dot"></span> Performance
-            </a>
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Work</p>
+                <x-nav-link href="{{ route('user.intern.tasks') }}" :active="request()->routeIs('user.intern.tasks*')" icon="file-code">
+                    My Tasks
+                </x-nav-link>
+                <x-nav-link href="{{ route('user.intern.submissions') }}" :active="request()->routeIs('user.intern.submissions*')" icon="clipboard-check">
+                    Submissions
+                </x-nav-link>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Activity</p>
+                <x-nav-link href="{{ route('user.intern.attendance') }}" :active="request()->routeIs('user.intern.attendance')" icon="calendar-check">
+                    Attendance
+                </x-nav-link>
+                <x-nav-link href="{{ route('user.intern.performance') }}" :active="request()->routeIs('user.intern.performance')" icon="trending-up">
+                    Performance
+                </x-nav-link>
+            </div>
         @endif
-<<<<<<< HEAD
-=======
-
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
     </nav>
 
-    <div class="sidebar-footer">
-        <div class="sidebar-user-label">Signed in as</div>
-        <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
-        <a href="{{ route('profile.edit') }}" class="sidebar-profile-link">Profile</a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout-btn">Sign out</button>
-        </form>
+    <!-- User Profile -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div class="flex items-center gap-3 px-2 py-3 rounded-xl bg-white border border-slate-200 shadow-sm mb-4">
+            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg border border-indigo-100">
+                {{ substr($userName, 0, 1) }}
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900 truncate">{{ $userName }}</p>
+                <p class="text-[10px] text-slate-500 truncate">{{ $userEmail }}</p>
+            </div>
+        </div>
+        
+        <div class="space-y-1">
+            <a href="{{ route('user.profile.edit') }}" class="flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-white hover:shadow-sm rounded-lg transition-all group">
+                <i data-lucide="settings" class="w-4 h-4 group-hover:rotate-45 transition-transform"></i>
+                Settings
+            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all group">
+                    <i data-lucide="log-out" class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"></i>
+                    Sign out
+                </button>
+            </form>
+        </div>
     </div>
-<<<<<<< HEAD
 </aside>
-=======
-</aside>
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26

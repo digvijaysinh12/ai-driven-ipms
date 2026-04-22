@@ -1,199 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Internship Platform</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css'])
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI-IPMS | Advanced Internship Management</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body style="background:#f5f5f4;color:#1a1a1a;font-family:'DM Sans',sans-serif;">
-
-{{-- ── Nav ── --}}
-<header style="background:#fff;border-bottom:1px solid #e5e5e5;padding:0 40px;
-               height:52px;display:flex;align-items:center;justify-content:space-between;
-               position:sticky;top:0;z-index:100;">
-    <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-size:13px;font-weight:500;letter-spacing:-0.01em;">
-            AI Internship Platform
-        </span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:#aaa;
-                     letter-spacing:0.08em;text-transform:uppercase;">
-            Enterprise
-        </span>
-    </div>
-    <nav style="display:flex;align-items:center;gap:8px;">
-        @auth
-            <a href="{{ route(strtolower(auth()->user()->role->name) . '.dashboard') }}"
-               class="btn-primary btn-sm">
-                Dashboard →
-            </a>
-        @else
-            <a href="{{ route('login') }}"
-               style="font-size:13px;color:#555;text-decoration:none;padding:6px 12px;">
-                Sign In
-            </a>
-            <a href="{{ route('register') }}" class="btn-primary btn-sm">
-                Request Access
-            </a>
-        @endauth
-    </nav>
-</header>
-
-{{-- ── Hero ── --}}
-<section style="max-width:1100px;margin:0 auto;padding:80px 40px 72px;
-                display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
-    <div>
-        <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;
-                    text-transform:uppercase;color:#888;margin-bottom:20px;">
-            Internship Lifecycle Management
-        </div>
-
-        <h1 style="font-size:36px;font-weight:500;letter-spacing:-0.03em;
-                   line-height:1.18;color:#1a1a1a;margin-bottom:20px;">
-            Structured internship<br>operations, end to end.
-        </h1>
-
-        <p style="font-size:14px;color:#666;line-height:1.75;
-                  margin-bottom:32px;font-weight:300;">
-            A role-based enterprise platform for HR teams, team leads, and interns.
-            Manages onboarding, approvals, mentor supervision, task tracking,
-            and AI-powered evaluations in one controlled environment.
-        </p>
-
-        @guest
-            <div style="display:flex;gap:10px;">
-                <a href="{{ route('register') }}" class="btn-primary">Request Access</a>
-                <a href="{{ route('login') }}"    class="btn-outline">Sign In</a>
-            </div>
-        @endguest
-    </div>
-
-    {{-- Highlights panel --}}
-    <div style="background:#fff;border:1px solid #e5e5e5;border-radius:2px;padding:28px;">
-        <div class="section-label" style="margin-bottom:20px;">Platform Capabilities</div>
-
-        @foreach([
-            'Secure role-based access — HR, Mentor, Intern',
-            'HR approval workflow before system access is granted',
-            'AI-driven question generation and code evaluation',
-            'Technology-based intern and mentor assignment',
-            'Attendance tracking via office WiFi IP detection',
-            'Controlled topic, submission and evaluation pipeline',
-            'Digital certificates with unique verification codes',
-        ] as $item)
-            <div style="display:flex;align-items:flex-start;gap:12px;
-                        padding:10px 0;border-bottom:1px solid #f0f0f0;
-                        font-size:13px;color:#444;line-height:1.5;">
-                <span style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;
-                             flex-shrink:0;margin-top:6px;"></span>
-                {{ $item }}
-            </div>
-        @endforeach
-    </div>
-</section>
-
-{{-- ── Role capabilities ── --}}
-<section style="background:#fff;border-top:1px solid #e5e5e5;
-                border-bottom:1px solid #e5e5e5;padding:64px 40px;">
-    <div style="max-width:1100px;margin:0 auto;">
-
-        <div class="section-label" style="margin-bottom:10px;">Access Levels</div>
-        <div style="font-size:22px;font-weight:500;letter-spacing:-0.02em;margin-bottom:40px;">
-            Role Capabilities
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-                    background:#e5e5e5;border:1px solid #e5e5e5;
-                    border-radius:2px;overflow:hidden;">
-
-            @foreach([
-                'HR' => [
-                    'Approve or reject intern registrations',
-                    'Assign technologies and mentors to interns',
-                    'Monitor all intern progress and activity',
-                    'Generate internship performance reports',
-                ],
-                'Mentor / Team Lead' => [
-                    'Create and publish internship topics',
-                    'Generate AI questions and review them',
-                    'Evaluate intern submissions and override scores',
-                    'Track assigned intern progress in detail',
-                ],
-                'Intern' => [
-                    'Register with technology selection',
-                    'Solve assigned exercises in built-in editor',
-                    'View AI and mentor feedback on submissions',
-                    'Track attendance, scores, and final grade',
-                ],
-            ] as $role => $items)
-                <div style="background:#fff;padding:28px;">
-                    <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;
-                                letter-spacing:0.08em;text-transform:uppercase;color:#1a1a1a;
-                                margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #ebebeb;">
-                        {{ $role }}
+<body class="antialiased bg-slate-50 font-sans text-slate-900">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                        <i data-lucide="brain-circuit" class="text-white w-5 h-5"></i>
                     </div>
-                    @foreach($items as $item)
-                        <div style="display:flex;align-items:flex-start;gap:10px;
-                                    font-size:13px;color:#555;margin-bottom:10px;line-height:1.5;">
-                            <span style="font-family:'DM Mono',monospace;font-size:11px;
-                                         color:#ccc;flex-shrink:0;margin-top:1px;">—</span>
-                            {{ $item }}
+                    <span class="text-xl font-bold tracking-tight">AI-IPMS</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="btn btn-primary text-xs uppercase tracking-widest px-6 py-2.5">
+                            Go to Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">Sign in</a>
+                        <a href="{{ route('register') }}" class="btn btn-accent text-xs uppercase tracking-widest px-6 py-2.5 rounded-xl">
+                            Request Access
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main>
+        <div class="relative overflow-hidden pt-16 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+                    <div class="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-4">Lifecycle Management</p>
+                        <h1 class="text-5xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 leading-[1.1]">
+                            Structured <span class="text-indigo-600">Internship</span> Operations.
+                        </h1>
+                        <p class="text-lg text-slate-500 font-medium leading-relaxed mb-10">
+                            A role-based enterprise platform for HR teams, team leads, and interns. 
+                            Manage onboarding, approvals, mentorship, and AI-powered evaluations in one controlled environment.
+                        </p>
+                        <div class="flex flex-wrap gap-4 sm:justify-center lg:justify-start">
+                            <a href="{{ route('register') }}" class="btn btn-primary px-8 py-4 rounded-2xl text-base shadow-2xl shadow-slate-900/20 active:scale-95 transition-all">
+                                Get Started
+                            </a>
+                            <div class="flex -space-x-2">
+                                @foreach([1,2,3,4] as $i)
+                                    <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold overflow-hidden shadow-sm">
+                                        <img src="https://i.pravatar.cc/100?img={{ $i+20 }}" alt="User">
+                                    </div>
+                                @endforeach
+                                <div class="w-10 h-10 rounded-full border-2 border-white bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600 shadow-sm">
+                                    +500
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-16 lg:mt-0 lg:col-span-6">
+                        <div class="relative mx-auto w-full rounded-3xl shadow-2xl overflow-hidden border border-slate-200 aspect-video bg-white p-4">
+                            <div class="bg-slate-50 rounded-2xl w-full h-full flex flex-col items-center justify-center gap-4 border border-slate-100">
+                                <i data-lucide="layout" class="w-20 h-20 text-slate-200"></i>
+                                <p class="text-slate-400 font-medium text-sm">Dashboard Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Access -->
+        <div class="bg-white py-24 border-y border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight text-slate-900">Access Levels</h2>
+                    <p class="mt-4 text-slate-500 font-medium">Fine-grained control for every stakeholder</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @foreach([
+                        ['role' => 'HR', 'icon' => 'user-check', 'color' => 'bg-emerald-50 text-emerald-600', 'items' => ['Approve registrations', 'Assign mentors', 'Monitor progress', 'Report Generation']],
+                        ['role' => 'Mentor', 'icon' => 'users', 'color' => 'bg-indigo-50 text-indigo-600', 'items' => ['Create curriculums', 'Review submissions', 'AI evaluation review', 'Direct supervision']],
+                        ['role' => 'Intern', 'icon' => 'graduation-cap', 'color' => 'bg-amber-50 text-amber-600', 'items' => ['Hands-on tasks', 'Real-time AI feedback', 'Attendance tracking', 'Performance metrics']]
+                    ] as $item)
+                        <div class="card p-8 group hover:border-indigo-200 transition-all hover:shadow-xl hover:shadow-indigo-500/5">
+                            <div class="w-12 h-12 {{ $item['color'] }} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i data-lucide="{{ $item['icon'] }}" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 mb-4">{{ $item['role'] }}</h3>
+                            <ul class="space-y-3">
+                                @foreach($item['items'] as $li)
+                                    <li class="flex items-center gap-2 text-sm text-slate-600 font-medium">
+                                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+                                        {{ $li }}
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     @endforeach
                 </div>
-            @endforeach
-
+            </div>
         </div>
-    </div>
-</section>
+    </main>
 
-{{-- ── Security section ── --}}
-<section style="max-width:1100px;margin:0 auto;padding:64px 40px;
-                display:grid;grid-template-columns:1fr 2fr;gap:60px;align-items:start;">
-    <div>
-        <div class="section-label" style="margin-bottom:10px;">Infrastructure</div>
-        <div style="font-size:18px;font-weight:500;letter-spacing:-0.02em;line-height:1.4;">
-            Enterprise Security Architecture
+    <footer class="py-12 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="text-sm font-bold text-slate-400 font-mono tracking-tighter uppercase">AI-IPMS Platform</span>
+            <div class="flex gap-8">
+                <a href="#" class="text-slate-400 hover:text-slate-900 text-sm font-medium">Documentation</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 text-sm font-medium">Privacy</a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 text-sm font-medium">Terms</a>
+            </div>
+            <p class="text-xs text-slate-400 font-medium">© {{ date('Y') }} AI-Driven Internship System</p>
         </div>
-    </div>
-    <div>
-        <p style="font-size:13.5px;color:#555;line-height:1.8;font-weight:300;margin-bottom:20px;">
-            The system enforces multi-layered security including authentication,
-            status-based login restrictions, role-based middleware authorization,
-            resource-level policies, and rate limiting to prevent abuse.
-            Designed to meet enterprise-level access control standards.
-        </p>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-            @foreach(['Role Middleware','Status Gating','Rate Limiting',
-                      'Email Verification','Resource Policies','CSRF Protection'] as $tag)
-                <span style="font-family:'DM Mono',monospace;font-size:11px;color:#555;
-                             background:#f0f0f0;padding:4px 10px;border-radius:2px;
-                             letter-spacing:0.04em;">
-                    {{ $tag }}
-                </span>
-            @endforeach
-        </div>
-    </div>
-</section>
+    </footer>
 
-{{-- ── Footer ── --}}
-<footer style="background:#fff;border-top:1px solid #e5e5e5;padding:20px 40px;
-               display:flex;justify-content:space-between;align-items:center;">
-    <span style="font-size:12px;color:#aaa;font-family:'DM Mono',monospace;">
-        AI Internship Platform
-    </span>
-    <span style="font-size:12px;color:#ccc;font-family:'DM Mono',monospace;">
-        © {{ date('Y') }}
-    </span>
-</footer>
-
-{{-- Responsive --}}
-<style>
-    @media (max-width: 768px) {
-        section { grid-template-columns: 1fr !important; gap: 32px !important; }
-        header  { padding: 0 20px !important; }
-    }
-</style>
-
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

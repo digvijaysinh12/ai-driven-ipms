@@ -24,7 +24,7 @@ class CheckAssigned
                                 ->where('is_active',true)
                                 ->exists();
             if(!$hasAssignement){
-                return redirect()->route('intern.waiting');
+                return redirect()->route('user.intern.waiting');
             }
         }
         return $next($request);

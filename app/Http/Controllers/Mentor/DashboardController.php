@@ -3,77 +3,74 @@
 namespace App\Http\Controllers\Mentor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
+use App\Models\TaskSubmission;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Topic;
-use App\Models\Question;
-use App\Models\Submission;
-use App\Models\InternTopicAssignment;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $mentorId = Auth::id();
 
-        // Total active interns assigned to this mentor
-        $internCount = DB::table('mentor_assignments')
+        $assignedInternsCount = DB::table('mentor_assignments')
             ->where('mentor_id', $mentorId)
             ->where('is_active', 1)
             ->count();
 
-        // All topics by this mentor
-        $topics = Topic::where('mentor_id', $mentorId)->get();
-        $topicIds = $topics->pluck('id');
+        $tasks = Task::query()
+            ->where('created_by', $mentorId)
+            ->with('submissions')
+            ->get();
 
-        $topicCount = $topics->count();
+        $taskIds = $tasks->pluck('id');
 
-        // Total questions across all topics
-        $questionCount = Question::whereIn('topic_id', $topicIds)->count();
+        $totalTasksCount = $tasks->count();
+        $draftTasksCount = $tasks->filter(fn (Task $task) => $task->isDraft())->count();
+        $readyTasksCount = $tasks->filter(fn (Task $task) => $task->isReady())->count();
 
-        // Topics that went through AI generation
-        $aiTopics = $topics->where('status', 'ai_generated')->count();
+        $pendingSubmissionsCount = TaskSubmission::query()
+            ->whereIn('task_id', $taskIds)
+            ->pending()
+            ->count();
 
-        // Topic status breakdown
-        $publishedTopics  = $topics->where('status', 'published')->count();
-        $draftTopics      = $topics->where('status', 'draft')->count();
+        $reviewedCount = TaskSubmission::query()
+            ->whereIn('task_id', $taskIds)
+            ->reviewed()
+            ->count();
 
-        // Submissions pending mentor review
-        $pendingReview = Submission::whereIn(
-            'question_id',
-            Question::whereIn('topic_id', $topicIds)->pluck('id')
-        )->where('status', 'ai_evaluated')->count();
-
-        // Fully reviewed submissions
-        $reviewedCount = Submission::whereIn(
-            'question_id',
-            Question::whereIn('topic_id', $topicIds)->pluck('id')
-        )->where('status', 'reviewed')->count();
-
-        // Recent topics for quick access
-        $recentTopics = Topic::where('mentor_id', $mentorId)
+        $recentTasks = Task::query()
+            ->where('created_by', $mentorId)
+            ->withCount('questions')
             ->latest()
             ->take(5)
             ->get();
 
-        // Recent intern assignments
-        $recentAssignments = InternTopicAssignment::whereIn('topic_id', $topicIds)
-            ->with(['intern', 'topic'])
-            ->latest('assigned_at')
+        $recentSubmissions = TaskSubmission::query()
+            ->whereIn('task_id', $taskIds)
+            ->whereNotNull('submitted_at')
+            ->with(['intern', 'task'])
+            ->latest('submitted_at')
             ->take(5)
             ->get();
 
+        $interns = User::whereHas('currentMentorAssignment', function ($q) use ($mentorId) {
+            $q->where('mentor_id', $mentorId);
+        })->get();
+
         return view('mentor.dashboard', compact(
-            'internCount',
-            'topicCount',
-            'questionCount',
-            'aiTopics',
-            'publishedTopics',
-            'draftTopics',
-            'pendingReview',
+            'assignedInternsCount',
+            'totalTasksCount',
+            'draftTasksCount',
+            'readyTasksCount',
+            'pendingSubmissionsCount',
             'reviewedCount',
-            'recentTopics',
-            'recentAssignments'
+            'recentTasks',
+            'recentSubmissions',
+            'interns'
         ));
     }
 }

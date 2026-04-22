@@ -4,11 +4,11 @@
 @section('content')
 <div class="page-header">
     <div class="page-title">Edit Topic</div>
-    <a href="{{ route('mentor.topics.show', $topic->id) }}" class="back-link">← Back to Topic</a>
+    <a href="{{ route('user.mentor.tasks.show', $topic->id) }}" class="back-link">← Back to Topic</a>
 </div>
 
 <div class="form-card">
-    <form method="POST" action="{{ route('mentor.topics.update', $topic->id) }}">
+    <form method="POST" action="{{ route('user.mentor.tasks.update', $topic->id) }}">
         @csrf @method('PUT')
 
         <div class="form-group">
@@ -25,7 +25,7 @@
 
         <div class="form-actions">
             <button type="submit" class="btn-primary">Save Changes</button>
-            <a href="{{ route('mentor.topics.show', $topic->id) }}" class="btn-outline">Cancel</a>
+            <a href="{{ route('user.mentor.tasks.show', $topic->id) }}" class="btn-outline">Cancel</a>
         </div>
     </form>
 </div>

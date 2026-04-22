@@ -4,34 +4,106 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') | AI Internship Platform</title>
+
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('styles')
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-in-out;
+}
+</style>
 </head>
-<body>
+<body class="font-sans antialiased text-slate-900 bg-slate-50/50">
+    <div class="min-h-screen flex bg-slate-50/50">
+        <!-- Sidebar -->
+        <x-sidebar />
 
-<div class="layout">
-    {{-- Single sidebar component — switches content by role automatically --}}
-    @include('components.sidebar')
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <!-- Topbar -->
+            <x-topbar />
 
-    <div class="main-col">
-        <header class="topbar">
-            <span class="topbar-title">@yield('title', 'Dashboard')</span>
-            <span class="topbar-meta">{{ ucfirst(auth()->user()->role->name ?? '') }} Panel</span>
-        </header>
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8">
+                <div class="max-w-7xl mx-auto space-y-6">
+            @if (isset($header))
+                <header class="flex items-center justify-between">
+                    <div class="space-y-1">
+                        {{ $header }}
+                    </div>
+                    @if (isset($actions))
+                        <div class="flex items-center gap-3">
+                            {{ $actions }}
+                        </div>
+                    @endif
+                </header>
+            @endif
 
-        <main class="page-content">
-<<<<<<< HEAD
-            <x-ui.flash />
-=======
-            @include('components.alert')
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-            @yield('content')
-        </main>
+                    @isset($slot)
+                        {{ $slot }}
+                    @endisset
+
+                    @hasSection('content')
+                        @yield('content')
+                    @endif
+                </div>
+            </main>
+        </div>
     </div>
-</div>
 
-@include('components.toast')
-@stack('scripts')
+    <!-- Toast Notifications -->
+    <x-toast />
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // OPEN MODAL
+    document.querySelectorAll('[data-modal-open]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.getAttribute('data-modal-open');
+            document.getElementById(id)?.classList.remove('hidden');
+        });
+    });
+
+    // CLOSE MODAL
+    document.querySelectorAll('[data-modal-close]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.getAttribute('data-modal-close');
+            document.getElementById(id)?.classList.add('hidden');
+        });
+    });
+
+    // ESC KEY CLOSE
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('[id]').forEach(modal => {
+                if (!modal.classList.contains('hidden') && modal.classList.contains('fixed')) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+    });
+
+});
+</script>
 </body>
 </html>

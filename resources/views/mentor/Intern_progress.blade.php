@@ -66,7 +66,7 @@
         <div class="page-title">{{ $intern->name }}</div>
         <div class="page-meta">{{ $intern->email }} · Progress Overview</div>
     </div>
-    <a href="{{ route('mentor.interns') }}" class="back-link">← All Interns</a>
+    <a href="{{ route('user.mentor.interns') }}" class="back-link">← All Interns</a>
 </div>
 
 {{-- Stats --}}

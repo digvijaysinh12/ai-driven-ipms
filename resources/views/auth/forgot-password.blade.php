@@ -1,28 +1,59 @@
-@extends('layouts.guest')
-@section('title', 'Reset Password')
+<x-guest-layout>
 
-@section('content')
-<div class="auth-body" style="justify-content:center;">
-    <div style="width:100%;max-width:420px;background:#fff;border:1px solid #e2e2e2;border-radius:2px;padding:48px 44px;">
-        <a href="{{ route('login') }}" class="back-link" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:32px;">← Back to Sign In</a>
+    <div class="w-full">
 
-        <div class="auth-title" style="margin-bottom:8px;">Reset Password</div>
-        <p style="font-size:13px;color:#666;margin-bottom:28px;line-height:1.6;">Enter your email and we'll send you a reset link.</p>
+        <!-- Back -->
+        <a href="{{ route('login') }}"
+           class="text-sm text-gray-500 hover:text-gray-700 mb-6 inline-block">
+            ← Back to Sign In
+        </a>
 
+        <!-- Title -->
+        <h2 class="text-xl font-bold text-gray-900 mb-2">
+            Reset Password
+        </h2>
+
+        <p class="text-sm text-gray-600 mb-6">
+            Enter your email and we'll send you a reset link.
+        </p>
+
+        <!-- Success Message -->
         @if(session('status'))
-            <div class="flash flash-success">{{ session('status') }}</div>
+            <div class="mb-4 p-2 bg-green-100 text-green-700 text-sm rounded">
+                {{ session('status') }}
+            </div>
         @endif
 
-        <form method="POST" action="{{ route('password.email') }}">
+        <!-- Form -->
+        <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
             @csrf
-            <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                       class="form-input" placeholder="you@company.com" required>
-                @error('email') <div class="form-error">{{ $message }}</div> @enderror
+
+            <!-- Email -->
+            <div>
+                <label class="text-sm font-medium text-gray-700">
+                    Email Address
+                </label>
+
+                <input type="email"
+                       name="email"
+                       value="{{ old('email') }}"
+                       placeholder="you@company.com"
+                       class="w-full mt-1 border rounded px-3 py-2 focus:ring focus:ring-indigo-200"
+                       required>
+
+                @error('email')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                @enderror
             </div>
-            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Send Reset Link</button>
+
+            <!-- Button -->
+            <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">
+                Send Reset Link
+            </button>
+
         </form>
+
     </div>
-</div>
-@endsection
+
+</x-guest-layout>

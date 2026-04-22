@@ -1,129 +1,105 @@
 @extends('layouts.app')
 @section('title', ucfirst(str_replace('_', ' ', $type)) . ' Questions')
 
-<<<<<<< HEAD
 @section('content')
-<div class="page-header">
-    <div>
-        <div class="page-title" style="text-transform: capitalize;">{{ str_replace('_', ' ', $type) }}</div>
-        <div class="page-meta">{{ $questions->count() }} questions - {{ $topic->title }}</div>
+<div class="page-shell-header">
+    <div class="page-shell-copy">
+        <div class="page-shell-eyebrow">{{ $topic->title }}</div>
+        <h1 class="page-shell-title" style="text-transform: capitalize;">{{ str_replace('_', ' ', $type) }} Questions</h1>
+        <p class="page-shell-subtitle">Review and manage the specific questions generated for this module.</p>
     </div>
-    <a href="{{ route('mentor.topics.show', $topic->id) }}" class="back-link"><- Back to Topic</a>
-=======
-@push('scripts')
-    <script src="{{ asset('js/questions.js') }}"></script>
-@endpush
-
-@section('content')
-<div class="page-header">
-    <div>
-        <div class="page-title" style="text-transform:capitalize;">{{ str_replace('_', ' ', $type) }}</div>
-        <div class="page-meta">
-            <span id="approved-counter">{{ $questions->where('status','approved')->count() }}</span>
-            / {{ $questions->count() }} approved · {{ $topic->title }}
-        </div>
+    <div class="page-shell-actions">
+        <x-ui.button :href="route('user.mentor.tasks.show', $topic->id)" variant="secondary">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Topic
+        </x-ui.button>
     </div>
-    <a href="{{ route('mentor.topics.show', $topic->id) }}" class="back-link">← Back to Topic</a>
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
 </div>
 
 @if($questions->isEmpty())
-    <div style="background:#fff;border:1px solid #e5e5e5;border-radius:2px;padding:56px;text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:#aaa;">
-<<<<<<< HEAD
-        No {{ str_replace('_', ' ', $type) }} questions found.
-=======
-        No {{ str_replace('_',' ',$type) }} questions found.
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+    <div class="card p-20 text-center border-dashed bg-slate-50/50">
+        <div class="w-16 h-16 bg-slate-100 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="help-circle" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">No questions found</h3>
+        <p class="text-xs text-slate-400 mt-2">AI has not generated questions for this type yet.</p>
     </div>
 @else
-    <div style="display:flex;flex-direction:column;gap:1px;background:#e5e5e5;border:1px solid #e5e5e5;border-radius:2px;overflow:hidden;">
+    <div class="mt-8 space-y-6">
         @foreach($questions as $i => $q)
-<<<<<<< HEAD
-            <div id="question-card-{{ $q->id }}" style="background:#fff;padding:24px 28px;">
-=======
-            <div id="question-card-{{ $q->id }}"
-                 class="{{ $q->status === 'approved' ? 'question-approved' : '' }}"
-                 style="background:#fff;padding:24px 28px;{{ $q->status === 'approved' ? 'border-left:3px solid #2ecc71;' : '' }}">
-
-                {{-- Question meta --}}
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                    <span class="cell-mono">Q{{ $i + 1 }}</span>
-                    <span style="font-family:'DM Mono',monospace;font-size:10px;background:#f0f0f0;color:#666;padding:2px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:0.06em;">
-                        {{ str_replace('_', ' ', $type) }}
-                    </span>
-<<<<<<< HEAD
-=======
-                    <x-badge :status="$q->status" />
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+            <div id="question-card-{{ $q->id }}" class="card p-0 overflow-hidden bg-white border border-slate-200 hover:shadow-xl transition-all duration-300 group">
+                <div class="p-6 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded bg-slate-900 text-white text-xs font-bold flex items-center justify-center">Q{{ $i + 1 }}</span>
+                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">{{ str_replace('_', ' ', $type) }}</span>
+                    </div>
                 </div>
 
-                <div style="font-size:14px;color:#1a1a1a;line-height:1.7;margin-bottom:14px;">
-                    {{ $q->problem_statement }}
-                </div>
+                <div class="p-8">
+                    <div class="text-base font-bold text-slate-900 leading-relaxed mb-6 whitespace-pre-line">
+                        {{ $q->problem_statement }}
+                    </div>
 
-                @if($q->code)
-                    <pre class="code-block" style="margin-bottom:14px;">{{ $q->code }}</pre>
-                @endif
+                    @if($q->code)
+                        <div class="bg-slate-950 rounded-lg p-6 mb-6 font-mono text-xs text-zinc-300 border border-slate-800 overflow-x-auto">
+                            <div class="text-slate-500 mb-2">// Code Snippet</div>
+                            <pre class="leading-relaxed">{{ $q->code }}</pre>
+                        </div>
+                    @endif
 
-<<<<<<< HEAD
-=======
-                {{-- MCQ options --}}
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                @if($type === 'mcq')
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;">
-                        @foreach(['A' => $q->option_a, 'B' => $q->option_b, 'C' => $q->option_c, 'D' => $q->option_d] as $key => $val)
-                            @if($val)
-                                <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:{{ $q->correct_answer === $key ? '#f0faf0' : '#f8f8f8' }};border:1px solid {{ $q->correct_answer === $key ? '#b8ddb8' : '#ebebeb' }};border-radius:2px;font-size:13px;">
-                                    <span style="font-family:'DM Mono',monospace;font-size:11px;color:{{ $q->correct_answer === $key ? '#1a6a1a' : '#aaa' }};min-width:16px;">{{ $key }}</span>
-                                    <span>{{ $val }}</span>
+                    @if($type === 'mcq')
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                            @foreach(['A', 'B', 'C', 'D'] as $key)
+                                @php 
+                                    $optProp = 'option_' . strtolower($key);
+                                    $val = $q->$optProp;
+                                    $isCorrect = $q->correct_answer === $key;
+                                @endphp
+                                @if($val)
+                                    <div class="flex items-start gap-4 p-4 rounded-xl border {{ $isCorrect ? 'bg-emerald-50/50 border-emerald-200 ring-2 ring-emerald-500/10' : 'bg-slate-50/50 border-slate-100 opacity-80' }} transition-all">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black {{ $isCorrect ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500' }}">
+                                            {{ $key }}
+                                        </div>
+                                        <div class="text-sm {{ $isCorrect ? 'text-emerald-900 font-bold' : 'text-slate-600' }}">{{ $val }}</div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if(in_array($type, ['true_false', 'blank', 'output']))
+                        <div class="mt-6 flex items-center gap-3">
+                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Expected Result</span>
+                            <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100 text-sm font-bold flex items-center gap-2">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                {{ $q->correct_answer }}
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($type === 'coding' && $q->referenceSolution?->solution_code)
+                        <div class="mt-8 border-t border-slate-100 pt-8">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i data-lucide="code-2" class="w-4 h-4 text-blue-500"></i>
+                                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Reference Solution</span>
+                            </div>
+                            <div class="bg-zinc-900 rounded-xl p-6 font-mono text-xs text-blue-400 border border-zinc-800 overflow-x-auto shadow-inner">
+                                <pre class="leading-loose">{{ $q->referenceSolution->solution_code }}</pre>
+                            </div>
+                            @if($q->referenceSolution->explanation)
+                                <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div class="text-[9px] font-black uppercase text-blue-500 mb-1">Logic Explanation</div>
+                                    <p class="text-xs text-blue-900 leading-relaxed">{{ $q->referenceSolution->explanation }}</p>
                                 </div>
                             @endif
-                        @endforeach
-                    </div>
-                @endif
-
-<<<<<<< HEAD
-=======
-                {{-- Answer for non-coding types --}}
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                @if(in_array($type, ['true_false', 'blank', 'output']))
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                        <span style="font-family:'DM Mono',monospace;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Answer</span>
-                        <span style="font-family:'DM Mono',monospace;font-size:13px;color:#1a6a1a;background:#f0faf0;padding:3px 10px;border-radius:2px;border:1px solid #c6e6c6;">
-                            {{ $q->correct_answer }}
-                        </span>
-                    </div>
-                @endif
-
-<<<<<<< HEAD
-                @if($type === 'coding' && $q->referenceSolution?->solution_code)
-                    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">
-                        Reference Solution
-                    </div>
-                    <pre class="code-block">{{ $q->referenceSolution->solution_code }}</pre>
-=======
-                {{-- Approve / Reject buttons (only if pending) --}}
-                @if($q->status === 'pending_review')
-                    <div class="action-group" style="margin-top:4px;">
-                        <button class="btn-primary btn-sm"
-                                data-action="approve"
-                                data-question-id="{{ $q->id }}">Approve</button>
-                        <button class="btn-outline btn-sm"
-                                data-action="reject"
-                                data-question-id="{{ $q->id }}"
-                                style="color:#c0392b;border-color:#e8b8b8;">Reject</button>
-                    </div>
-                @elseif($q->status === 'approved')
-                    <div style="font-family:'DM Mono',monospace;font-size:11px;color:#1a6a1a;margin-top:4px;">✓ Approved</div>
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                @endif
+                        </div>
+                    @endif
+                </div>
             </div>
         @endforeach
     </div>
 @endif
-<<<<<<< HEAD
+
+<script>
+    lucide.createIcons();
+</script>
 @endsection
-=======
-@endsection
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26

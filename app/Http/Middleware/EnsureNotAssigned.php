@@ -23,7 +23,7 @@ class EnsureNotAssigned
                         ->exists();
 
         if($hasAssignment){
-            return redirect()->route('intern.dashboard');
+            return redirect()->route('user.intern.dashboard');
         }
         return $next($request);
     }

@@ -3,167 +3,121 @@
 namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\InternTopicAssignment;
+use App\Models\Attendance;
 use App\Models\MentorAssignment;
-use App\Models\Submission;
-use App\Models\Question;
+use App\Models\TaskSubmission;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $intern = Auth::user();
 
-        // ── Mentor info ──────────────────────────────────────────
-        $mentorAssignment = MentorAssignment::where('intern_id', $intern->id)
+        $mentorAssignment = MentorAssignment::query()
+            ->where('intern_id', $intern->id)
             ->where('is_active', true)
             ->with('mentor')
             ->first();
 
         $mentor = $mentorAssignment?->mentor;
 
-        // ── Current (latest) topic assignment ────────────────────
-        $currentAssignment = InternTopicAssignment::where('intern_id', $intern->id)
-            ->with('topic')
-            ->latest()
-            ->first();
+        // ✅ FIX: use user_id
+        $tasks = $intern->assignedTasks()
+            ->with(['type', 'submissions' => fn($q) => $q->where('user_id', $intern->id)])
+            ->withCount('questions')
+            ->latest('task_user.assigned_at')
+            ->get();
 
-        // ── Stats ────────────────────────────────────────────────
+        // ✅ FIX: user_id + load status
+        $submissions = TaskSubmission::query()
+            ->where('user_id', $intern->id)
+            ->with(['task', 'reviewer', 'status'])
+            ->latest('submitted_at')
+            ->get();
 
-        // Total topic assignments ever given to this intern
-        $topicCount = InternTopicAssignment::where('intern_id', $intern->id)->count();
+        $totalTasksCount = $tasks->count();
 
-        // Total questions in the current topic
-        $questionCount = 0;
-<<<<<<< HEAD
-        $submittedCount = 0;
+        // ✅ FIX: proper status filtering
+        $completedTasksCount = $submissions->filter(function ($s) {
+            return in_array($s->status?->slug, ['completed', 'ai_evaluated']);
+        })->count();
 
-        if ($currentAssignment?->topic) {
-            $questionIds = $currentAssignment->topic->questions()->pluck('id');
-            $questionCount = $questionIds->count();
+        // ✅ FIX: correct pending logic
+        $submittedTaskIds = $submissions->pluck('task_id')->unique();
+        $pendingTasksCount = $totalTasksCount - $submittedTaskIds->count();
 
-            $submittedCount = Submission::where('intern_id', $intern->id)
-                ->whereIn('question_id', $questionIds)
-                ->count();
-        }
-
-=======
-        if ($currentAssignment?->topic) {
-            $questionCount = $currentAssignment->topic->questions()->count();
-        }
-
-        // How many questions this intern has submitted answers for
-        $submittedCount = Submission::where('intern_id', $intern->id)->count();
-
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-        // Remaining questions in current topic
-        $pendingCount = max(0, $questionCount - $submittedCount);
-
-        // AI-evaluated submissions (scored but not yet reviewed by mentor)
-        $evaluatedCount = Submission::where('intern_id', $intern->id)
-            ->where('status', 'ai_evaluated')
-            ->count();
-
-        // Fully reviewed by mentor
-        $reviewedCount = Submission::where('intern_id', $intern->id)
-            ->where('status', 'reviewed')
-            ->count();
-
-        // Average final score across reviewed submissions
-        $avgScore = Submission::where('intern_id', $intern->id)
-            ->whereNotNull('final_score')
-            ->avg('final_score');
-
-        $avgScore = $avgScore ? round($avgScore, 1) : null;
+        $averageScore = $submissions->whereNotNull('score')->avg('score') ?? 0;
 
         return view('intern.dashboard', compact(
             'mentor',
-            'currentAssignment',
-            'topicCount',
-            'questionCount',
-            'submittedCount',
-            'pendingCount',
-            'evaluatedCount',
-            'reviewedCount',
-            'avgScore'
+            'tasks',
+            'submissions',
+            'totalTasksCount',
+            'completedTasksCount',
+            'pendingTasksCount',
+            'averageScore'
         ));
-<<<<<<< HEAD
     }
 
-    public function attendance()
+    public function attendance(): View
     {
         $internId = Auth::id();
 
-        $mentorAssignment = MentorAssignment::where('intern_id', $internId)
+        $mentorAssignment = MentorAssignment::query()
+            ->where('intern_id', $internId)
             ->where('is_active', true)
             ->with('mentor')
             ->first();
 
-        $currentAssignment = InternTopicAssignment::where('intern_id', $internId)
-            ->with('topic')
-            ->latest('assigned_at')
+        $todayAttendance = Attendance::query()
+            ->where('user_id', $internId)
+            ->whereDate('date', today())
+            ->latest('login_time')
             ->first();
 
-        return view('intern.attendance.index', compact('mentorAssignment', 'currentAssignment'));
-    }
-
-    public function performance()
-    {
-        $internId = Auth::id();
-
-        $assignments = InternTopicAssignment::where('intern_id', $internId)
-            ->with('topic')
-            ->latest('assigned_at')
+        $recentAttendances = Attendance::query()
+            ->where('user_id', $internId)
+            ->latest('login_time')
+            ->take(10)
             ->get();
 
-        $submissions = Submission::where('intern_id', $internId)
-            ->with('question')
-            ->get();
+        $totalTrackedSeconds = Attendance::query()
+            ->where('user_id', $internId)
+            ->sum('total_seconds');
 
-        $submissionsByTopic = $submissions
-            ->filter(fn (Submission $submission) => $submission->question !== null)
-            ->groupBy(fn (Submission $submission) => $submission->question->topic_id);
-
-        $assignmentCount = $assignments->count();
-        $submittedAssignments = $assignments->whereIn('status', ['submitted', 'evaluated'])->count();
-        $evaluatedAssignments = $assignments->where('status', 'evaluated')->count();
-        $reviewedAnswers = $submissions->where('status', 'reviewed')->count();
-        $averageFinalScore = $this->roundAverage($submissions->whereNotNull('final_score')->avg('final_score'));
-
-        $latestEvaluatedAssignment = $assignments->firstWhere('status', 'evaluated');
-
-        $topicPerformance = $assignments->map(function (InternTopicAssignment $assignment) use ($submissionsByTopic) {
-            $topicSubmissions = $submissionsByTopic->get($assignment->topic_id, collect());
-
-            return (object) [
-                'topic' => $assignment->topic,
-                'status' => $assignment->status,
-                'grade' => $assignment->grade,
-                'feedback' => $assignment->feedback,
-                'deadline' => $assignment->deadline,
-                'submitted_at' => $assignment->submitted_at,
-                'ai_score' => $this->roundAverage($topicSubmissions->whereNotNull('ai_total_score')->avg('ai_total_score')),
-                'final_score' => $this->roundAverage($topicSubmissions->whereNotNull('final_score')->avg('final_score')),
-                'reviewed_answers' => $topicSubmissions->where('status', 'reviewed')->count(),
-            ];
-        });
-
-        return view('intern.performance.index', compact(
-            'assignmentCount',
-            'submittedAssignments',
-            'evaluatedAssignments',
-            'reviewedAnswers',
-            'averageFinalScore',
-            'latestEvaluatedAssignment',
-            'topicPerformance'
+        return view('intern.attendance.index', compact(
+            'mentorAssignment',
+            'todayAttendance',
+            'recentAttendances',
+            'totalTrackedSeconds'
         ));
     }
 
-    private function roundAverage($value): ?float
+    public function performance(): View
     {
-        return $value === null ? null : round((float) $value, 1);
-=======
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+        $intern = Auth::user();
+
+        $tasks = $intern->assignedTasks()
+            ->with(['type', 'submissions' => fn($q) => $q->where('user_id', $intern->id)])
+            ->withCount('questions')
+            ->get();
+
+        $submissions = TaskSubmission::query()
+            ->where('user_id', $intern->id)
+            ->with(['task', 'reviewer', 'status'])
+            ->latest('submitted_at')
+            ->get();
+
+        $totalTasks = $tasks->count();
+        $totalSubmissions = $submissions->count();
+
+        return view('intern.performance.index', compact(
+            'tasks',
+            'submissions',
+            'totalTasks',
+            'totalSubmissions'
+        ));
     }
 }

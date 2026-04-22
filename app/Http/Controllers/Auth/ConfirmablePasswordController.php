@@ -43,8 +43,8 @@ class ConfirmablePasswordController extends Controller
     {
         return match ($user->role->name ?? null) {
             'hr' => route('hr.dashboard', absolute: false),
-            'mentor' => route('mentor.dashboard', absolute: false),
-            'intern' => route('intern.dashboard', absolute: false),
+            'mentor' => route('user.mentor.dashboard', absolute: false),
+            'intern' => route('user.intern.dashboard', absolute: false),
             default => url('/'),
         };
     }

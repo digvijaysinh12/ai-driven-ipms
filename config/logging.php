@@ -91,7 +91,7 @@ return [
                 'port' => env('PAPERTRAIL_PORT'),
                 'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
             ],
-            'processors' => [PsrLogMessageProcessor::class],  
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'stderr' => [
@@ -125,6 +125,17 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        'task_debug' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/task_debug.log'),
+            'level' => 'debug',
+        ],
+        'ai' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/ai.log'),
+            'level' => 'debug',
         ],
 
     ],

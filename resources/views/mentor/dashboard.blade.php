@@ -1,213 +1,133 @@
-@extends('layouts.app')
-<<<<<<< HEAD
-@section('title', 'Mentor Dashboard')
-=======
-@section('title', 'Dashboard')
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-
-@section('content')
-<div class="stat-mosaic" style="margin-bottom:1px;">
-    <x-stat-card label="Interns"       :value="$internCount" />
-    <x-stat-card label="Topics"        :value="$topicCount" />
-    <x-stat-card label="Questions"     :value="$questionCount" />
-    <x-stat-card label="Published"     :value="$publishedTopics" accent="accent" />
-</div>
-<div class="stat-mosaic">
-    <x-stat-card label="AI Generated"  :value="$aiTopics" />
-    <x-stat-card label="Draft"         :value="$draftTopics" />
-    <x-stat-card label="Pending Review":value="$pendingReview"  accent="warn" />
-    <x-stat-card label="Reviewed"      :value="$reviewedCount"  accent="accent" />
-</div>
-
-<<<<<<< HEAD
-<div class="container-fluid">
-
-    {{-- 🔹 Top Stats --}}
-    <div class="row g-3 mb-3">
-        <div class="col-md-3">
-            <x-stat-card label="Interns" :value="$internCount" icon="fa-users"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Topics" :value="$topicCount" icon="fa-book"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Questions" :value="$questionCount" icon="fa-question-circle"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Published" :value="$publishedTopics" accent="accent" icon="fa-check"/>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <x-stat-card label="AI Generated" :value="$aiTopics" icon="fa-robot"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Draft" :value="$draftTopics" icon="fa-edit"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Pending Review" :value="$pendingReview" accent="warn" icon="fa-clock"/>
-        </div>
-        <div class="col-md-3">
-            <x-stat-card label="Reviewed" :value="$reviewedCount" accent="accent" icon="fa-check-double"/>
-        </div>
-    </div>
-
-    {{-- 🔹 Quick Actions --}}
-    <div class="mb-4 d-flex gap-2">
-        <a href="{{ route('mentor.topics.create') }}" class="btn btn-primary">
-            <i class="fa fa-plus"></i> Create Topic
-        </a>
-        <a href="{{ route('mentor.assignments') }}" class="btn btn-outline-dark">
-            <i class="fa fa-tasks"></i> View Assignments
-        </a>
-    </div>
-
-    {{-- 🔹 Recent Topics --}}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header d-flex justify-content-between">
-            <h6 class="mb-0">Recent Topics</h6>
-            <a href="{{ route('mentor.topics.index') }}">View all →</a>
+<x-app-layout>
+    <div class="space-y-8">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Mentor Workspace</h1>
+                <p class="text-slate-500 mt-1 font-medium">Overview of your assigned interns and pending evaluations.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('user.mentor.tasks.create') }}" class="btn btn-accent px-6 py-2.5 shadow-lg shadow-indigo-200 gap-2 active:scale-95 transition-all">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Launch New Task
+                </a>
+            </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Title</th>
-                        <th>Status</th>
-                        <th>Questions</th>
-                        <th>Created</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($recentTopics as $topic)
-                        <tr>
-                            <td><strong>{{ $topic->title }}</strong></td>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            @php
+                $stats = [
+                    ['label' => 'Mentees', 'value' => $assignedInternsCount, 'icon' => 'users-2', 'trend' => 'Assigned', 'color' => 'indigo'],
+                    ['label' => 'Draft Tasks', 'value' => $draftTasksCount, 'icon' => 'edit-3', 'trend' => 'In Prep', 'color' => 'slate'],
+                    ['label' => 'Ready Tasks', 'value' => $readyTasksCount, 'icon' => 'check-circle', 'trend' => 'Deployable', 'color' => 'blue'],
+                    ['label' => 'Pending Reviews', 'value' => $pendingSubmissionsCount, 'icon' => 'alert-circle', 'trend' => 'Action Needed', 'color' => 'amber'],
+                ];
+            @endphp
 
-                            <td>
-                                <x-badge :status="$topic->status" />
-                            </td>
-
-                            <td>{{ $topic->questions()->count() }}</td>
-
-                            <td>{{ $topic->created_at->format('d M Y') }}</td>
-
-                            <td>
-                                <a href="{{ route('mentor.topics.show', $topic->id) }}" class="btn btn-sm btn-outline-primary">
-                                    View
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
-                                No topics created yet 🚀
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    {{-- 🔹 Recent Assignments --}}
-    <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between">
-            <h6 class="mb-0">Recent Assignments</h6>
-            <a href="{{ route('mentor.assignments') }}">View all →</a>
+            @foreach($stats as $stat)
+                <div class="card p-6 group hover:border-{{ $stat['color'] }}-200 transition-all duration-300">
+                    <div class="flex items-start justify-between">
+                        <div class="p-3 bg-{{ $stat['color'] }}-50 rounded-xl text-{{ $stat['color'] }}-600 transition-transform group-hover:scale-110">
+                            <i data-lucide="{{ $stat['icon'] }}" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">{{ $stat['trend'] }}</span>
+                    </div>
+                    <div class="mt-6">
+                        <div class="text-4xl font-black text-slate-900">{{ $stat['value'] ?? 0 }}</div>
+                        <div class="text-sm font-semibold text-slate-500 mt-1">{{ $stat['label'] }}</div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Intern</th>
-                        <th>Topic</th>
-                        <th>Status</th>
-                        <th>Deadline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($recentAssignments as $asgn)
-                        <tr>
-                            <td><strong>{{ $asgn->intern->name ?? '—' }}</strong></td>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Submissions -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-indigo-500"></i>
+                        Recent Submissions
+                    </h2>
+                    <a href="{{ route('user.mentor.submissions.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">View all</a>
+                </div>
 
-                            <td>{{ $asgn->topic->title ?? '—' }}</td>
+                <div class="card bg-white overflow-hidden">
+                    <div class="divide-y divide-slate-50">
+                        @forelse($recentSubmissions as $submission)
+                            <div class="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center font-black text-slate-400">
+                                        {{ substr($submission->intern->name ?? 'U', 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-slate-900">{{ $submission->task->title ?? 'Untitled Task' }}</h3>
+                                        <div class="flex items-center gap-2 text-xs font-medium text-slate-500 mt-0.5">
+                                            <span class="text-indigo-600">@ {{ $submission->intern->name ?? 'Unknown' }}</span>
+                                            <span class="text-slate-300">•</span>
+                                            <span>{{ $submission->submitted_at?->diffForHumans() ?? 'N/A' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    @if($submission->status?->slug === 'ai_evaluated')
+                                        <span class="badge bg-emerald-50 text-emerald-700 border-emerald-100 py-1 px-3">AI Evaluated</span>
+                                    @endif
+                                    <a href="{{ route('user.mentor.submissions.show', $submission->id) }}" class="btn btn-secondary py-1.5 px-4 text-xs font-bold border-slate-200">
+                                        Review
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-20 text-center">
+                                <i data-lucide="inbox" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                                <p class="text-slate-400 font-medium">No pending submissions discovered yet.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
 
-                            <td>
-                                <x-badge :status="$asgn->status" />
-                            </td>
+            <!-- Quick Access / Interns -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="users" class="w-5 h-5 text-indigo-500"></i>
+                    My Interns
+                </h2>
+                
+                <div class="card p-2 space-y-1">
+                    @foreach($interns ?? [] as $intern)
+                        <a href="{{ route('user.mentor.interns.progress', $intern->id) }}" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                    {{ substr($intern->name, 0, 1) }}
+                                </div>
+                                <span class="text-sm font-semibold text-slate-700">{{ $intern->name }}</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+                        </a>
+                    @endforeach
+                    
+                    <a href="{{ route('user.mentor.interns') }}" class="block text-center p-3 text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors border-t border-slate-50 mt-2">
+                        View all intern metrics
+                    </a>
+                </div>
 
-                            <td>
-                                {{ \Carbon\Carbon::parse($asgn->deadline)->format('d M Y') }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                No assignments yet 📭
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                <!-- AI Token Usage / Card Placeholder -->
+                <div class="card p-6 bg-slate-900 border-none shadow-xl shadow-slate-200 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-4">
+                            <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+                            AI Power
+                        </div>
+                        <h4 class="text-white font-bold leading-tight">Your evaluation assistant is active.</h4>
+                        <p class="text-slate-400 text-xs mt-2">AI automatically pre-grades common MCQ and Theory submissions to save your time.</p>
+                    </div>
+                    <!-- Decorative element -->
+                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                </div>
+            </div>
         </div>
     </div>
-
-=======
-{{-- Recent Topics --}}
-<div class="section-row" style="margin-top:4px;">
-    <div class="section-label" style="margin-bottom:0;">Recent Topics</div>
-    <a href="{{ route('mentor.topics.index') }}" class="section-link">View all →</a>
-</div>
-<div class="table-card">
-    <table class="data-table">
-        <thead>
-            <tr><th>Title</th><th>Status</th><th>Questions</th><th>Created</th><th></th></tr>
-        </thead>
-        <tbody>
-            @forelse($recentTopics as $topic)
-                <tr>
-                    <td class="cell-name">{{ $topic->title }}</td>
-                    <td><x-badge :status="$topic->status" /></td>
-                    <td class="cell-mono">{{ $topic->questions()->count() }}</td>
-                    <td class="cell-mono">{{ $topic->created_at->format('d M Y') }}</td>
-                    <td>
-                        <a href="{{ route('mentor.topics.show', $topic->id) }}" class="action-link">View</a>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="5" class="empty-state">No topics yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-</div>
-
-{{-- Recent Assignments --}}
-<div class="section-row">
-    <div class="section-label" style="margin-bottom:0;">Recent Assignments</div>
-    <a href="{{ route('mentor.assignments') }}" class="section-link">View all →</a>
-</div>
-<div class="table-card">
-    <table class="data-table">
-        <thead>
-            <tr><th>Intern</th><th>Topic</th><th>Status</th><th>Deadline</th></tr>
-        </thead>
-        <tbody>
-            @forelse($recentAssignments as $asgn)
-                <tr>
-                    <td class="cell-name">{{ $asgn->intern->name ?? '—' }}</td>
-                    <td style="color:#555;">{{ $asgn->topic->title ?? '—' }}</td>
-                    <td><x-badge :status="$asgn->status" /></td>
-                    <td class="cell-mono">{{ \Carbon\Carbon::parse($asgn->deadline)->format('d M Y') }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="4" class="empty-state">No assignments yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-@endsection
+</x-app-layout>

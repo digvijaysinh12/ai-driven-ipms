@@ -41,16 +41,18 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('login')->with('error', $message);
         }
 
+
         return match ($user->role->name) {
-            'hr'     => redirect()->route('hr.dashboard'),
-            'mentor' => redirect()->route('mentor.dashboard'),
-            'intern' => redirect()->route('intern.dashboard'),
-            default  => redirect()->route('dashboard'),
+            'hr' => redirect()->route('admin.dashboard'),
+            'mentor' => redirect()->route('user.mentor.dashboard'),
+            'intern' => redirect()->route('user.intern.dashboard'),
+            default => redirect()->route('dashboard'),
         };
     }
 
     public function destroy(Request $request): RedirectResponse
     {
+
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

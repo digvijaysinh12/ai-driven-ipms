@@ -1,64 +1,94 @@
-@extends('layouts.guest')
-@section('title', 'Create Account')
-
-@section('content')
-<div class="auth-wrapper">
-    <div class="auth-brand">
-        <div>
-            <div class="brand-label">AI Internship Platform</div>
-            <div class="brand-name">Manage.<br>Assess.<br>Grow.</div>
-        </div>
-        <div class="brand-tagline">Structured learning management<br>for teams and their interns.</div>
+<x-guest-layout>
+    <div class="mb-10 text-center">
+        <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Create account</h2>
+        <p class="text-slate-500 font-medium mt-2">Join our AI-driven internship platform</p>
     </div>
 
-    <div class="auth-panel">
-        <div class="auth-title">Create Account</div>
+    <form method="POST" action="{{ route('register') }}" class="space-y-5">
+        @csrf
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-            <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="name" value="{{ old('name') }}"
-                       class="form-input" placeholder="Jane Smith" required>
-                @error('name') <div class="form-error">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                       class="form-input" placeholder="you@company.com" required>
-                @error('email') <div class="form-error">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-input" placeholder="••••••••" required>
-                @error('password') <div class="form-error">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" name="password_confirmation" class="form-input" placeholder="••••••••" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Role</label>
-                <div style="position:relative;">
-                    <select name="role" id="role" class="form-select" required>
-                        <option value="">Select role</option>
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
-                                {{ $role->name === 'mentor' ? 'Team Lead' : ucfirst($role->name) }}
-                            </option>
-                        @endforeach
-                    </select>
+        <!-- Name -->
+        <div class="space-y-2">
+            <x-input-label for="name" :value="__('Full Name')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="user" class="w-4 h-4"></i>
                 </div>
-                @error('role') <div class="form-error">{{ $message }}</div> @enderror
+                <x-text-input id="name" class="block w-full pl-11 py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" placeholder="Jane Smith" />
             </div>
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        </div>
 
-            <div class="form-group" id="technology-wrapper" style="display:none;">
-                <label class="form-label">Technology</label>
-                <select name="technology_id" class="form-select">
+        <!-- Email Address -->
+        <div class="space-y-2">
+            <x-input-label for="email" :value="__('Email Address')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                </div>
+                <x-text-input id="email" class="block w-full pl-11 py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" type="email" name="email" :value="old('email')" required autocomplete="username" placeholder="name@company.com" />
+            </div>
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-2">
+            <x-input-label for="password" :value="__('Password')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                </div>
+                <x-text-input id="password" class="block w-full pl-11 py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                type="password"
+                                name="password"
+                                required autocomplete="new-password"
+                                placeholder="••••••••" />
+            </div>
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="space-y-2">
+            <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <x-text-input id="password_confirmation" class="block w-full pl-11 py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                type="password"
+                                name="password_confirmation" required autocomplete="new-password"
+                                placeholder="••••••••" />
+            </div>
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <!-- Role -->
+        <div class="space-y-2">
+            <x-input-label for="role" :value="__('Platform Role')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i>
+                </div>
+                <select id="role" name="role" required class="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 focus:bg-white transition-all appearance-none cursor-pointer">
+                    <option value="">Select your role</option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                            {{ $role->name === 'mentor' ? 'Team Lead / Mentor' : ucfirst($role->name) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
+        <!-- Technology Focus (Conditional) -->
+        <div id="technology-wrapper" style="display:none;" class="space-y-2">
+            <x-input-label for="technology_id" :value="__('Technology Focus')" class="text-xs font-bold uppercase tracking-wider text-slate-500" />
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-slate-900 transition-colors">
+                    <i data-lucide="code-2" class="w-4 h-4"></i>
+                </div>
+                <select id="technology_id" name="technology_id" class="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 focus:bg-white transition-all appearance-none cursor-pointer">
                     <option value="">Select technology</option>
                     @foreach ($technologies as $t)
                         <option value="{{ $t->id }}" {{ old('technology_id') == $t->id ? 'selected' : '' }}>
@@ -66,28 +96,39 @@
                         </option>
                     @endforeach
                 </select>
-                @error('technology_id') <div class="form-error">{{ $message }}</div> @enderror
             </div>
+            <x-input-error :messages="$errors->get('technology_id')" class="mt-2" />
+        </div>
 
-            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">Create Account</button>
+        <div class="pt-2">
+            <x-primary-button class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98]">
+                {{ __('Create Account') }}
+            </x-primary-button>
+        </div>
 
-            <div class="divider"></div>
-            <div class="auth-footer">
-                Already registered? <a href="{{ route('login') }}" class="link">Sign in</a>
-            </div>
-        </form>
-    </div>
-</div>
+        <p class="text-center text-sm font-medium text-slate-500 mt-8">
+            {{ __('Already have an account?') }} 
+            <a href="{{ route('login') }}" class="text-indigo-600 font-bold hover:underline underline-offset-4 decoration-2 transition-all">
+                {{ __('Sign in') }}
+            </a>
+        </p>
+    </form>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const roleSelect  = document.getElementById('role');
-    const techWrapper = document.getElementById('technology-wrapper');
-    function toggle() {
-        techWrapper.style.display = roleSelect.value === 'intern' ? 'block' : 'none';
-    }
-    toggle();
-    roleSelect.addEventListener('change', toggle);
-});
-</script>
-@endsection
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleSelect  = document.getElementById('role');
+            const techWrapper = document.getElementById('technology-wrapper');
+            function toggle() {
+                if (roleSelect.value === 'intern') {
+                    techWrapper.style.display = 'block';
+                    document.getElementById('technology_id').setAttribute('required', 'required');
+                } else {
+                    techWrapper.style.display = 'none';
+                    document.getElementById('technology_id').removeAttribute('required');
+                }
+            }
+            toggle();
+            roleSelect.addEventListener('change', toggle);
+        });
+    </script>
+</x-guest-layout>

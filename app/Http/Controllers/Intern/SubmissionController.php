@@ -3,202 +3,104 @@
 namespace App\Http\Controllers\Intern;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
+use App\Models\TaskSubmission;
+use App\Services\SubmissionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< HEAD
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-=======
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-use App\Models\Question;
-use App\Models\Submission;
-use App\Models\InternTopicAssignment;
-use App\Services\GroqEvaluationService;
 
 class SubmissionController extends Controller
 {
-<<<<<<< HEAD
+    public function __construct(private readonly SubmissionService $submissionService)
+    {
+    }
+
     /**
-     * FINAL SUBMIT — sends all answers to AI in ONE prompt.
-     * AI returns a grade (A/B/C/D/E) + overall feedback.
+     * Handle the submission of a task.
+     * Supports both JSON (API) and Web Form redirects.
      */
-    public function finalSubmit(Request $request, int $assignmentId, GroqEvaluationService $evaluator)
+    /**
+     * Auto-save a single answer
+     */
+    public function saveAnswer(Request $request, Task $task): JsonResponse
     {
-        $internId = Auth::id();
-=======
-    // ─────────────────────────────────────────────────────────────
-    // FINAL SUBMIT — sends all answers to AI in ONE prompt
-    // AI returns a grade (A/B/C/D/E) + overall feedback
-    // ─────────────────────────────────────────────────────────────
-    public function finalSubmit(Request $request, int $assignmentId, GroqEvaluationService $evaluator)
-    {
-        $internId   = Auth::id();
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+        $request->validate([
+            'question_id' => 'nullable|exists:task_questions,id',
+            'answer' => 'nullable|string',
+            'github_link' => 'nullable|url',
+            'file' => 'nullable|file|max:5120', // 5MB limit
+        ]);
 
-        $assignment = InternTopicAssignment::where('id', $assignmentId)
-            ->where('intern_id', $internId)
-            ->with('topic')
-            ->firstOrFail();
-
-<<<<<<< HEAD
-        // Guard: already submitted/evaluated
-=======
-        // Guard: already evaluated
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-        if (in_array($assignment->status, ['submitted', 'evaluated'])) {
-            return redirect()->route('intern.topic')
-                ->with('error', 'This exercise has already been submitted.');
-        }
-
-        $questionIds   = Question::where('topic_id', $assignment->topic_id)->pluck('id');
-        $answeredCount = Submission::where('intern_id', $internId)
-            ->whereIn('question_id', $questionIds)
-            ->count();
-
-        if ($answeredCount === 0) {
-            return redirect()->route('intern.topic')
-                ->with('error', 'Please answer at least one question before submitting.');
-        }
-
-        // Mark assignment as submitted first (locks further changes)
-<<<<<<< HEAD
-        DB::transaction(function () use ($assignment) {
-=======
-        \DB::transaction(function () use ($assignment) {
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-            $assignment->update([
-                'status'       => 'submitted',
-                'submitted_at' => now(),
-            ]);
-        });
-
-<<<<<<< HEAD
-        // Send ALL answers to Groq in one prompt
-=======
-        // ── Send ALL answers to Groq in one prompt ──────────────
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
         try {
-            $result = $evaluator->evaluateExercise($assignment);
+            $user = Auth::user();
+            $submission = $this->submissionService->getOrCreateSubmission($task, $user);
 
-            return redirect()->route('intern.topic')
-                ->with('exercise_result', [
-                    'grade'    => $result['grade'],
-                    'summary'  => $result['summary'],
-                    'feedback' => $result['feedback'],
-                ]);
+            $data = $request->only(['answer', 'github_link', 'execution_output', 'error_message']);
+            
+            // Handle file upload if present
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $data['file_path'] = $file->store('submissions/' . $submission->id, 'public');
+            }
+
+            $this->submissionService->saveAnswer($submission, $request->question_id, $data);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Answer saved'
+            ]);
 
         } catch (\Exception $e) {
-<<<<<<< HEAD
-            Log::error("Exercise evaluation failed for assignment {$assignmentId}: " . $e->getMessage());
-
-            return redirect()->route('intern.topic')
-                ->with('success', 'Exercise submitted! AI evaluation is in progress — check back shortly.');
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 422);
         }
     }
 
     /**
-     * Submissions list — show grade when evaluated.
+     * Handle the final submission of a task.
      */
-=======
-            \Log::error("Exercise evaluation failed for assignment {$assignmentId}: " . $e->getMessage());
+    public function submit(Request $request, Task $task): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            $submission = $this->submissionService->getOrCreateSubmission($task, $user);
 
-            // Submission is saved, evaluation pending — mentor can grade manually
-            return redirect()->route('intern.topic')
-                ->with('success', 'Exercise submitted! Evaluation is being processed — check back shortly.');
+            $this->submissionService->submit($submission);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Task submitted successfully.',
+                'data' => $submission->load('status')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 422);
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Submissions list — show grade when evaluated, hide raw scores
-    // ─────────────────────────────────────────────────────────────
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-    public function index()
-    {
-        $internId = Auth::id();
 
-<<<<<<< HEAD
-=======
-        // Load topic assignments with grade result
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-        $assignments = InternTopicAssignment::where('intern_id', $internId)
-            ->with('topic')
-            ->latest('assigned_at')
-            ->get();
 
-        $submissions = Submission::where('intern_id', $internId)
-            ->with('question')
-            ->latest()
-            ->paginate(20);
+public function showResults(Task $task)
+{
+    $user = Auth::user();
 
-        $totalSubmissions = $submissions->total();
-<<<<<<< HEAD
-        $reviewedCount    = Submission::where('intern_id', $internId)
-            ->where('status', 'reviewed')
-            ->count();
-=======
-        $reviewedCount    = $submissions->where('status', 'reviewed')->count();
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
+    $submission = TaskSubmission::with([
+        'task.type',
+        'task.questions',
+        'answers',
+        'status'
+    ])
+    ->where('task_id', $task->id)
+    ->where('user_id', $user->id)
+    ->latest()
+    ->firstOrFail();
 
-        return view('intern.submissions', compact(
-            'assignments',
-            'submissions',
-            'totalSubmissions',
-            'reviewedCount'
-        ));
-    }
-
-<<<<<<< HEAD
-    /**
-     * PHP Code runner for coding questions.
-     */
-=======
-    // ─────────────────────────────────────────────────────────────
-    // PHP Code runner for coding questions in the exercise
-    // ─────────────────────────────────────────────────────────────
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-    public function runCode(Request $request)
-    {
-        $request->validate(['code' => 'required|string|max:5000']);
-
-        $code = $request->code;
-
-        $blocked = [
-            'exec', 'shell_exec', 'system', 'passthru', 'popen',
-            'proc_open', 'pcntl_exec', 'file_put_contents', 'unlink',
-            'rmdir', 'rename', 'copy', 'eval', 'assert', 'create_function',
-        ];
-
-        foreach ($blocked as $fn) {
-            if (stripos($code, $fn) !== false) {
-                return response()->json([
-<<<<<<< HEAD
-                    'error' => "Function '{$fn}()' is not allowed in the exercise runner.",
-=======
-                    'error' => "Function '{$fn}()' is not allowed in the exercise runner."
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-                ]);
-            }
-        }
-
-<<<<<<< HEAD
-        $tmpFile     = tempnam(sys_get_temp_dir(), 'ex_') . '.php';
-=======
-        $tmpFile = tempnam(sys_get_temp_dir(), 'ex_') . '.php';
-
->>>>>>> 0389c7f0eb061d077a59d46e50c87b9e9e6dab26
-        $wrappedCode = "<?php\n"
-            . "set_time_limit(5);\n"
-            . "ini_set('memory_limit','32M');\n"
-            . "error_reporting(E_ALL);\n"
-            . "ini_set('display_errors','1');\n"
-            . preg_replace('/^<\?php\s*/i', '', $code);
-
-        file_put_contents($tmpFile, $wrappedCode);
-
-        exec('php ' . escapeshellarg($tmpFile) . ' 2>&1', $outputLines, $return);
-        $output = implode("\n", $outputLines);
-        @unlink($tmpFile);
-
-        return response()->json(['output' => $output]);
-    }
+    return view('intern.tasks.results', compact('submission'));
+}
 }

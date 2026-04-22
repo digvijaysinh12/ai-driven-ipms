@@ -4,11 +4,11 @@
 @section('content')
 <div class="page-header">
     <div class="page-title">New Topic</div>
-    <a href="{{ route('mentor.topics.index') }}" class="back-link">← All Topics</a>
+    <a href="{{ route('user.mentor.tasks.index') }}" class="back-link">← All Topics</a>
 </div>
 
 <div class="form-card">
-    <form method="POST" action="{{ route('mentor.topics.store') }}">
+    <form method="POST" action="{{ route('user.mentor.tasks.store') }}">
         @csrf
 
         <div class="form-group">
@@ -43,7 +43,7 @@
 
         <div class="form-actions">
             <button type="submit" class="btn-primary">Create Topic</button>
-            <a href="{{ route('mentor.topics.index') }}" class="btn-outline">Cancel</a>
+            <a href="{{ route('user.mentor.tasks.index') }}" class="btn-outline">Cancel</a>
         </div>
     </form>
 </div>
